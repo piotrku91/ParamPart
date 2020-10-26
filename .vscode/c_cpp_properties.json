@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/piotr/.arduino15/packages/arduino/tools/**",
+                "/home/piotr/.arduino15/packages/arduino/hardware/avr/1.8.1/libraries/**",
+                "/home/piotr/.arduino15/packages/arduino/hardware/avr/1.8.1/**"
+            ],
+            "forcedInclude": [
+                "/home/piotr/.arduino15/packages/arduino/hardware/avr/1.8.1/cores/arduino/Arduino.h"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu18",
+            "defines": [ "USBCON" ]
+        }
+    ],
+    "version": 4
+}

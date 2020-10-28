@@ -2,16 +2,16 @@
 
 /* 
 Arduino Serial Data Splitter - ParamPart
-Created by Piotr Kupczyk (dajmosster@gmail.com) 
+Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
 v. 2.4
-*/ 
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart::EmptyCut()
+inline void ParamPart::EmptyCut() // Clear unused parameters
 {
-  int i = ParamCount;
+  int i = ParamReadedCount;
   while (i < Max)
   {
     strcpy(Params[i], NULL);
@@ -21,48 +21,51 @@ void ParamPart::EmptyCut()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart::Clear()
+inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
 {
-  ParamCount = 0;
+  ParamReadedCount = 0;
   strcpy(Command, NULL);
   EmptyCut();
   SyntaxTest = false;
+  ReadFlag=false;
+  DebugIntegrityDump = "";
 };
 
-bool ParamPart::Header(char Spr[])
+bool ParamPart::Header(char Expected_Command[])
 {
-  if ((strcmp(Command, Spr)) == 0)
+  if ((strcmp(Command, Expected_Command)) == 0)
   {
-    return 1;
+    return true;
   };
-  return 0;
+  return false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ParamPart::Slicer(char Linia[])
+bool ParamPart::Slicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {
   Clear();
   int i = 0;
   char *strtokIndx;
-  if (strchr(Linia, ';') == NULL)
+  char DC = DelimiterChar;
+  if ((strchr(Line, DC) == NULL) || (Line[0]!=OpenLine))
   {
     SyntaxTest = false;
     Clear();
     return false;
   };
 
-  strtokIndx = strtok(Linia, ";");
+  strtokIndx = strtok(Line, &DC);
   strcpy(Command, strtokIndx);
 
   for (; ((strtokIndx != NULL) && (i <= Max)); i++)
   {
-    strtokIndx = strtok(NULL, ";");
+    strtokIndx = strtok(NULL, &DC);
     strcpy(Params[i], strtokIndx);
   };
 
-  i = i - 2; // Usuń znak > i nastepny zwiekszony petla.
-  ParamCount = i;
+  i = i - 2; // Remove > char from end, and cut counter.
+  ParamReadedCount = i;
   EmptyCut();
   SyntaxTest = true;
   return true;
@@ -72,27 +75,27 @@ bool ParamPart::Slicer(char Linia[])
 
 void ParamPart::CheckParamTypes()
 {
-  for (int i = 0; i < Max; i++)
+  for (int i = 0; i < Max; i++) // Clear types
   {
-    Type[i] = 0;
-  }; //Wyzeruj Typey
+    RType[i] = 0;
+  }; 
 
   for (int i = 0; i < Max; i++)
   {
 
     for (int z = 0; (z < MAX_PARAM_LENGTH && Params[i][z] != NULL); z++)
     {
-      // Sprawdza po znakach Type zapisany w parametrze. Gdy Type zmieniony juz na "TEKST" nie zamienia juz Type na "LICZBA" (Umożliwia zapis liczb w tekscie).
+      // Checking char by char what type is there. Just one char changes type to String (it is not integer) 
       if (isDigit(Params[i][z]))
       {
-        if (Type[i] == 1)
-          Type[i] = 1; // Type = String (TEKST)
+        if (RType[i] == 1)
+          RType[i] = 1; // Type = String (TEKST)
         else
-          Type[i] = 0; // Tyoe = Integer (LICZBA)
+          RType[i] = 0; // Tyoe = Integer (LICZBA)
       }
       else
       {
-        Type[i] = 1;
+        RType[i] = 1;
       };
     };
   };
@@ -102,86 +105,79 @@ void ParamPart::CheckParamTypes()
 
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
-  if ((!CheckIntegrity) or (InputExpectedParams == 0))
-    return true; // Jeśli wyłączona lub brak parametrów zwraca zawsze prawde.
+  
+  if (InputExpectedParams != ParamReadedCount)
+  {
+    if (DebugEnabled)
+      DebugIntegrityDump = "MEP"; // Missing expected parameters
+    return false;                 // Fail integrity test.
+  };
+  if (!CheckIntegrity)
+    return true; // If function is disabled just pass integrity test.
 
   CheckParamTypes();
 
   if (DebugEnabled)
   {
-    // Typy z wejścia (input)
-    DebugIntegrity[0] = 'I';
-    DebugIntegrity[1] = ':';
-    DebugIntegrity[2] = Type1;
-    DebugIntegrity[3] = Type2;
-    DebugIntegrity[4] = Type3;
-    DebugIntegrity[5] = Type4;
-    DebugIntegrity[6] = Type5;
-    DebugIntegrity[7] = Type6;
-    DebugIntegrity[8] = Type7;
-    DebugIntegrity[9] = Type8;
-    DebugIntegrity[10] = Type9;
+    // Expected parameters debug
+    DebugIntegrityDump = "E: " + (String)Type1 + (String)Type2 + (String)Type3 + (String)Type4 + (String)Type5 + (String)Type6 + (String)Type7 + (String)Type8 + (String)Type9;
+    DebugIntegrityDump = DebugIntegrityDump + " / R: ";
 
-    DebugIntegrity[11] = '/';
-
-    // Typy spodziewane (expected)
-    DebugIntegrity[11] = 'E';
-    DebugIntegrity[12] = ':';
-
-    for (int i = 13; i <= 0; i++)
+    // Received parameters debug
+    for (int i = 0; i < 9; i++)
     {
-      DebugIntegrity[i] = Type[i - 13];
+      DebugIntegrityDump = DebugIntegrityDump + RType[i];
     };
   };
 
-  ////////////////////////
+  // If some expected parameter dismatch -> fail integrity test.
   if (InputExpectedParams >= 1)
   {
-    if (Type1 != Type[0])
+    if (Type1 != RType[0])
       return false;
   }
   if (InputExpectedParams >= 2)
   {
-    if (Type2 != Type[1])
+    if (Type2 != RType[1])
       return false;
   }
   if (InputExpectedParams >= 3)
   {
-    if (Type3 != Type[2])
+    if (Type3 != RType[2])
       return false;
   }
   if (InputExpectedParams >= 4)
   {
-    if (Type4 != Type[3])
+    if (Type4 != RType[3])
       return false;
   }
   if (InputExpectedParams >= 5)
   {
-    if (Type5 != Type[4])
+    if (Type5 != RType[4])
       return false;
   }
   if (InputExpectedParams >= 6)
   {
-    if (Type6 != Type[5])
+    if (Type6 != RType[5])
       return false;
   }
   if (InputExpectedParams >= 7)
   {
-    if (Type7 != Type[6])
+    if (Type7 != RType[6])
       return false;
   }
   if (InputExpectedParams >= 8)
   {
-    if (Type8 != Type[7])
+    if (Type8 != RType[7])
       return false;
   }
   if (InputExpectedParams >= 9)
   {
-    if (Type9 != Type[8])
+    if (Type9 != RType[8])
       return false;
   }
 
-  return true;
+  return true; // Parameters match -> Pass integrity test
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,20 +188,20 @@ void ParamPart::Glue(char Line[])
   String Glue_hand;
   String tmpstr;
 
-  Glue_hand = Command; //Zrzucanie komendy
-  Glue_hand += ';';
+  Glue_hand = Command; // Dump command 
+  Glue_hand += DelimiterChar;
 
-  for (int i; i < Max; i++)
+  for (int i; i < Max; i++) // Dump parameters
   {
-    tmpstr = Params[i]; //Zrzucanie parametrów
+    tmpstr = Params[i]; 
     if (Params[i][0] != NULL)
     {
 
-      Glue_hand += tmpstr + ';';
+      Glue_hand += tmpstr + DelimiterChar;
     };
   };
 
-  Glue_hand += '>'; // Zakończenie komendy
+  Glue_hand += CloseLine; // Close line
   Line = strcpy(Line, Glue_hand.c_str());
 };
 
@@ -216,9 +212,17 @@ void ParamPart::operator<<(char Line[])
   Slicer(Line);
 }
 
+
+void ParamPart::operator<<(String Line)
+{
+  char CvLine[128];
+  strcpy(CvLine, Line.c_str());
+  Slicer(CvLine);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-char *ParamPart::operator[](uint8_t n)
+char *ParamPart::operator[](uint8_t n) 
 {
   return Params[n];
 }

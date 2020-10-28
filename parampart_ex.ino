@@ -2,21 +2,35 @@
 
 /* 
 Arduino Serial Data Splitter - ParamPart_Ex (Extended Version with Serial Receiver)
-Created by Piotr Kupczyk (dajmosster@gmail.com) 
+Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
 v. 2.4
-*/ 
+*/
 
 void ParamPart_Ex::SerialChecker(char newLine[])
 {
     String Dane; // tmp string
 
-    strcpy(newLine, "#"); // linie ignorowane
+    strcpy(newLine, "#"); // Lines starts with # char are ignored.
 
     while (pnt_Serial->available())
     {
         Dane = pnt_Serial->readStringUntil(NULL);
         strcpy(newLine, Dane.c_str());
+    };
+};
+
+String ParamPart_Ex::RawRead()
+{
+    char tmpnewLine[64];
+    SerialChecker(tmpnewLine);
+    if (tmpnewLine[0] != '#')
+    {
+        return tmpnewLine;
+    }
+    else
+    {
+        return "";
     };
 };
 
@@ -28,15 +42,23 @@ void ParamPart_Ex::HybridRead(void (*ptn_func_interpreter)(ParamPart_Ex *PP))
     if (tmpnewLine[0] != '#')
     {
         Slicer(tmpnewLine);
-        // pnt_Serial->println(tmpnewLine); // DEBUG LINE
-        (*ptn_func_interpreter)(this); // Uruchamia funkcje CALLBACK, która zareaguje na dane. Dostęp do Obiektu ParamPart_Ex przez wskaźnik w argumencie funkcji.
+
+        if (SyntaxVerify())
+        { //   (SYNTAX OK)
+
+            (*ptn_func_interpreter)(this); // Execute reaction function (callback), push pointer of this class to access from external function.
+
+            if ((DebugEnabled) && (DebugIntegrityDump != ""))
+                pnt_Serial->println(DebugIntegrityDump); // Debug Integrity print
+            if ((DebugEnabled) && (!GetReadFlag()))
+                pnt_Serial->println("UC!"); // Unknown command print
+            Clear();                        // Clear parampart to prepare for the next input.
+        }
+        else
+        { // (SYNTAX ERROR)
+
+            if ((DebugEnabled))
+                pnt_Serial->println("SE!"); // Syntax Error - missing < or ; or >
+        };
     }
-
-    /* 
-Przykład funkcji w programie:
-void Reaction(ParamPart_Ex * P){Serial.println(P->Params[0])};
-
-Przykład wywołania:
-Odczyt.HybridRead(&Reaction);
-*/
 };

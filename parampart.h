@@ -59,6 +59,7 @@ public:
 
   // Constructors
   ParamPart() { Clear(); };
+  ParamPart(char OL, char DL, char CL):  OpenLine(OL),DelimiterChar(DL),CloseLine(CL) { Clear(); };
   ParamPart(char Line[])
   {
     Clear();

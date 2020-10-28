@@ -19,6 +19,7 @@ public:
     
     // Constructors for extended class
     ParamPart_Ex(HardwareSerial *WS) : ParamPart(), pnt_Serial(WS){};
+    ParamPart_Ex(HardwareSerial *WS, char OL, char DC, char CL) : ParamPart(OL,DC,CL), pnt_Serial(WS){};
 };
 
 #endif PARAMPART_EX__H

@@ -30,7 +30,7 @@ ParamPart_Ex Odczyt(&Serial);
 void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
 {
 
-    if ((P->Header("<name")) && (P->Integrity(3, STRING, NUMBER, NUMBER)))
+    if ((P->Header("name")) && (P->Integrity(3, STRING, NUMBER, NUMBER)))
     {
         P->pnt_Serial->print("Hi ");
         P->pnt_Serial->print(P->Params[0]);
@@ -42,8 +42,15 @@ void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
         P->Readed();
     };
 
+     if ((P->Header("test")) && (P->Integrity(1, NUMBER))) //Example of comparition and return score.
+    {
+        if (atoi(P->Params[0])>5) { P->Readed(); } else { P->Readed(true, "too small");}; 
+    };
 
-    if ((P->Header("<dbg")) && (P->Integrity(1, NUMBER))) //Example of change Debug mode status
+    
+
+
+    if ((P->Header("dbg")) && (P->Integrity(1, NUMBER))) //Example of change Debug mode status
     {
         if (atoi(P->Params[0]))
         {
@@ -69,5 +76,7 @@ void loop()
     delay(1000);
  
     Odczyt.HybridRead(&Reaction);
+
     delay(1000);
+  //  Serial.println("siema");
 }

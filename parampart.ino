@@ -27,13 +27,13 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   strcpy(Command, NULL);
   EmptyCut();
   SyntaxTest = false;
-  ReadFlag=false;
+  SetReadFlag(false);
   DebugIntegrityDump = "";
 };
 
-bool ParamPart::Header(char Expected_Command[])
+bool ParamPart::Header(char CmdName[])
 {
-  if ((strcmp(Command, Expected_Command)) == 0)
+  if ((strcmp(Command, CmdName)) == 0)
   {
     return true;
   };
@@ -56,7 +56,7 @@ bool ParamPart::Slicer(char Line[]) // Main function to split line to command an
   };
 
   strtokIndx = strtok(Line, &DC);
-  strcpy(Command, strtokIndx);
+  strcpy(Command, strtokIndx+1);
 
   for (; ((strtokIndx != NULL) && (i <= Max)); i++)
   {
@@ -117,7 +117,7 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
 
   CheckParamTypes();
 
-  if (DebugEnabled)
+  if (DebugIntegrityEnabled)
   {
     // Expected parameters debug
     DebugIntegrityDump = "E: " + (String)Type1 + (String)Type2 + (String)Type3 + (String)Type4 + (String)Type5 + (String)Type6 + (String)Type7 + (String)Type8 + (String)Type9;
@@ -188,7 +188,7 @@ void ParamPart::Glue(char Line[])
   String Glue_hand;
   String tmpstr;
 
-  Glue_hand = Command; // Dump command 
+  Glue_hand = OpenLine + Command; // Dump command 
   Glue_hand += DelimiterChar;
 
   for (int i; i < Max; i++) // Dump parameters
@@ -212,13 +212,6 @@ void ParamPart::operator<<(char Line[])
   Slicer(Line);
 }
 
-
-void ParamPart::operator<<(String Line)
-{
-  char CvLine[128];
-  strcpy(CvLine, Line.c_str());
-  Slicer(CvLine);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

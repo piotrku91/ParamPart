@@ -34,6 +34,13 @@ String ParamPart_Ex::RawRead()
     };
 };
 
+void ParamPart_Ex::Readed(bool RtnMsg, String ParamRtn, String Rtn)
+{
+    if (RtnMsg)
+    pnt_Serial->println(OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
+    SetReadFlag(true);
+};
+
 void ParamPart_Ex::HybridRead(void (*ptn_func_interpreter)(ParamPart_Ex *PP))
 {
     char tmpnewLine[64];
@@ -48,11 +55,11 @@ void ParamPart_Ex::HybridRead(void (*ptn_func_interpreter)(ParamPart_Ex *PP))
 
             (*ptn_func_interpreter)(this); // Execute reaction function (callback), push pointer of this class to access from external function.
 
-            if ((DebugEnabled) && (DebugIntegrityDump != ""))
+            if ((DebugIntegrityEnabled) && (DebugIntegrityDump != ""))
                 pnt_Serial->println(DebugIntegrityDump); // Debug Integrity print
             if ((DebugEnabled) && (!GetReadFlag()))
-                pnt_Serial->println("UC!"); // Unknown command print
-            Clear();                        // Clear parampart to prepare for the next input.
+                pnt_Serial->println("UC! (" + (String)Command + ")"); // Unknown command print
+            Clear();                                                  // Clear parampart to prepare for the next input.
         }
         else
         { // (SYNTAX ERROR)

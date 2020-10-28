@@ -9,6 +9,7 @@
 #define MAX_PARAM_LENGTH 16
 #define MAX_PARAMS 9
 #define CHECK_INTEGRITY_DEFAULT_STATUS true
+#define DEBUG_INTEGRITY_DEFAULT_STATUS true
 #define DEBUG_DEFAULT_STATUS true
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,6 +37,7 @@ public:
   String DebugIntegrityDump;
 
   bool CheckIntegrity = CHECK_INTEGRITY_DEFAULT_STATUS;
+  bool DebugIntegrityEnabled = DEBUG_INTEGRITY_DEFAULT_STATUS;
   bool DebugEnabled = DEBUG_DEFAULT_STATUS;
   char DelimiterChar = ';';
   char OpenLine = '<';
@@ -45,6 +47,7 @@ public:
   void Clear();
   bool Header(char Spr[]);
   bool GetReadFlag(){return ReadFlag;};
+  void SetReadFlag(bool NF){ReadFlag=NF;};
   void Readed(){ReadFlag=true;};
   bool Slicer(char Line[]);
   void Glue(char Line[]);

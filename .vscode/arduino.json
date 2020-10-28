@@ -1,7 +1,9 @@
 {
     "programmer": "AVRISP mkII",
     "board": "arduino:avr:uno",
-    "sketch": "parampart.ino",
+    "sketch": "example.ino",
     "port": "/dev/ttyACM0",
-    "defines": [ "USBCON" ]
+    "defines": [
+        "USBCON"
+    ]
 }

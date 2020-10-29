@@ -42,41 +42,37 @@ void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
         P->Readed();
     };
 
-     if ((P->Header("test")) && (P->Integrity(1, NUMBER))) //Example of comparition and return score.
+    if ((P->Header("test")) && (P->Integrity(2, NUMBER))) //Example of comparition and return score.
     {
-        if (atoi(P->Params[0])>5) { P->Readed(); } else { P->Readed(true, "too small");}; 
+        if (atoi(P->Params[0]) > atoi(P->Params[1])) P->Readed(true, "1st is bigger");
+        if (atoi(P->Params[0]) < atoi(P->Params[1])) P->Readed(true, "2nd is bigger");
+        if (atoi(P->Params[0]) == atoi(P->Params[1])) P->Readed(true, "same");
+
     };
-
-    
-
 
     if ((P->Header("dbg")) && (P->Integrity(1, NUMBER))) //Example of change Debug mode status
     {
         if (atoi(P->Params[0]))
         {
             P->pnt_Serial->println("Debug on. ");
-            P->DebugEnabled = true;
+          //  P->DebugEnabled = true;
         }
         else
         {
             P->pnt_Serial->println("Debug off. ");
-            P->DebugEnabled = false;
+           // P->DebugEnabled = false;
         };
         P->Readed();
     };
-
-
-
-
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop()
 {
-    delay(1000);
- 
-    Odczyt.HybridRead(&Reaction);
+    delay(150);
 
-    delay(1000);
-  //  Serial.println("siema");
+    Odczyt.HybridRead(&Reaction);
+delay(1500);
+   
+    //  Serial.println("siema");
 }

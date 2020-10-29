@@ -16,7 +16,6 @@
 #define STRING 1
 #define NUMBER 0
 
-
 class ParamPart // Klasa paczki odbieranych parametrow
 {
 
@@ -24,7 +23,7 @@ private:
   static const uint8_t Max = MAX_PARAMS;
   uint8_t ParamReadedCount = 0;
   bool SyntaxTest = false;
-  bool ReadFlag=false;
+  bool ReadFlag = false;
 
   // Private functions
   void CheckParamTypes();
@@ -45,12 +44,12 @@ public:
 
   // Public functions
   void Clear();
-  bool Header(char Spr[]);
-  bool GetReadFlag(){return ReadFlag;};
-  void SetReadFlag(bool NF){ReadFlag=NF;};
-  void Readed(){ReadFlag=true;};
-  bool Slicer(char Line[]);
-  void Glue(char Line[]);
+  bool Header(String CmdName);
+  bool GetReadFlag() { return ReadFlag; };
+  void SetReadFlag(bool NF) { ReadFlag = NF; };
+  void Readed() { ReadFlag = true; };
+  bool Slicer(String *LineS);
+  String Glue();
 
   bool SyntaxVerify() { return SyntaxTest; };
   bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0);
@@ -62,12 +61,7 @@ public:
 
   // Constructors
   ParamPart() { Clear(); };
-  ParamPart(char OL, char DL, char CL):  OpenLine(OL),DelimiterChar(DL),CloseLine(CL) { Clear(); };
-  ParamPart(char Line[])
-  {
-    Clear();
-    Slicer(Line);
-  };
+  ParamPart(char OL, char DL, char CL) : OpenLine(OL), DelimiterChar(DL), CloseLine(CL) { Clear(); };
 };
 
-#endif PARAMPART_H
+#endif

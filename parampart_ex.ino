@@ -1,4 +1,4 @@
-#include "parampart_ex.h";
+#include "parampart_ex.h"
 
 /* 
 Arduino Serial Data Splitter - ParamPart_Ex (Extended Version with Serial Receiver)
@@ -7,23 +7,24 @@ Written by Piotr Kupczyk (dajmosster@gmail.com)
 v. 2.4
 */
 
-void ParamPart_Ex::SerialChecker(char newLine[])
+void ParamPart_Ex::SerialChecker(String *newLine)
 {
     String Dane; // tmp string
 
-    strcpy(newLine, "#"); // Lines starts with # char are ignored.
+    Dane = "#";
 
     while (pnt_Serial->available())
     {
-        Dane = pnt_Serial->readStringUntil(NULL);
-        strcpy(newLine, Dane.c_str());
+        Dane = pnt_Serial->readStringUntil(0);
     };
+
+    *newLine = Dane;
 };
 
 String ParamPart_Ex::RawRead()
 {
-    char tmpnewLine[64];
-    SerialChecker(tmpnewLine);
+    String tmpnewLine;
+    SerialChecker(&tmpnewLine);
     if (tmpnewLine[0] != '#')
     {
         return tmpnewLine;
@@ -37,18 +38,18 @@ String ParamPart_Ex::RawRead()
 void ParamPart_Ex::Readed(bool RtnMsg, String ParamRtn, String Rtn)
 {
     if (RtnMsg)
-    pnt_Serial->println(OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
+        pnt_Serial->println(OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
     SetReadFlag(true);
 };
 
 void ParamPart_Ex::HybridRead(void (*ptn_func_interpreter)(ParamPart_Ex *PP))
 {
-    char tmpnewLine[64];
-    SerialChecker(tmpnewLine);
+    String tmpnewLine;
+    SerialChecker(&tmpnewLine);
 
     if (tmpnewLine[0] != '#')
     {
-        Slicer(tmpnewLine);
+        Slicer(&tmpnewLine);
 
         if (SyntaxVerify())
         { //   (SYNTAX OK)

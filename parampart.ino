@@ -14,7 +14,7 @@ inline void ParamPart::EmptyCut() // Clear unused parameters
   int i = ParamReadedCount;
   while (i < Max)
   {
-    strcpy(Params[i], NULL);
+    strcpy(Params[i], 0);
     i++;
   };
 };
@@ -31,9 +31,10 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   DebugIntegrityDump = "";
 };
 
-bool ParamPart::Header(char CmdName[])
+bool ParamPart::Header(String CmdName)
 {
-  if ((strcmp(Command, CmdName)) == 0)
+  const char *Cmd = CmdName.c_str();
+  if ((strcmp(Command, Cmd)) == 0)
   {
     return true;
   };
@@ -41,14 +42,16 @@ bool ParamPart::Header(char CmdName[])
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool ParamPart::Slicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
+bool ParamPart::Slicer(String *LineS) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {
   Clear();
-  int i = 0;
+  //char * Line = new char[LineS->length()];
+  char Line[128];
+  strcpy(Line, LineS->c_str());
+  int i = 0; // Split counter
   char *strtokIndx;
   char DC = DelimiterChar;
-  if ((strchr(Line, DC) == NULL) || (Line[0]!=OpenLine))
+  if ((Line[0] != OpenLine) || (strchr(Line, DC) == 0)) // Check if is syntax (example chars: <   ;   > )
   {
     SyntaxTest = false;
     Clear();
@@ -56,36 +59,35 @@ bool ParamPart::Slicer(char Line[]) // Main function to split line to command an
   };
 
   strtokIndx = strtok(Line, &DC);
-  strcpy(Command, strtokIndx+1);
+  strcpy(Command, strtokIndx + 1);
 
-  for (; ((strtokIndx != NULL) && (i <= Max)); i++)
+  for (; ((strtokIndx != 0) && (i <= Max)); i++)
   {
-    strtokIndx = strtok(NULL, &DC);
+    strtokIndx = strtok(0, &DC);
     strcpy(Params[i], strtokIndx);
   };
 
-  i = i - 2; // Remove > char from end, and cut counter.
+  i = i - 2; // Remove > char from end
   ParamReadedCount = i;
   EmptyCut();
   SyntaxTest = true;
+ // delete Line;
   return true;
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ParamPart::CheckParamTypes()
 {
   for (int i = 0; i < Max; i++) // Clear types
   {
     RType[i] = 0;
-  }; 
+  };
 
   for (int i = 0; i < Max; i++)
   {
 
-    for (int z = 0; (z < MAX_PARAM_LENGTH && Params[i][z] != NULL); z++)
+    for (int z = 0; (z < MAX_PARAM_LENGTH && Params[i][z] != 0); z++)
     {
-      // Checking char by char what type is there. Just one char changes type to String (it is not integer) 
+      // Checking char by char what type is there. Just one char changes type to String (it is not integer)
       if (isDigit(Params[i][z]))
       {
         if (RType[i] == 1)
@@ -105,7 +107,7 @@ void ParamPart::CheckParamTypes()
 
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
-  
+
   if (InputExpectedParams != ParamReadedCount)
   {
     if (DebugEnabled)
@@ -121,12 +123,12 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
   {
     // Expected parameters debug
     DebugIntegrityDump = "E: " + (String)Type1 + (String)Type2 + (String)Type3 + (String)Type4 + (String)Type5 + (String)Type6 + (String)Type7 + (String)Type8 + (String)Type9;
-    DebugIntegrityDump = DebugIntegrityDump + " / R: ";
+    DebugIntegrityDump += " / R: ";
 
     // Received parameters debug
     for (int i = 0; i < 9; i++)
     {
-      DebugIntegrityDump = DebugIntegrityDump + RType[i];
+      DebugIntegrityDump += RType[i];
     };
   };
 
@@ -134,6 +136,7 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
   if (InputExpectedParams >= 1)
   {
     if (Type1 != RType[0])
+    
       return false;
   }
   if (InputExpectedParams >= 2)
@@ -182,19 +185,19 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart::Glue(char Line[])
+String ParamPart::Glue()
 {
   //   Clear();
   String Glue_hand;
   String tmpstr;
 
-  Glue_hand = OpenLine + Command; // Dump command 
+  Glue_hand = OpenLine + Command; // Dump command
   Glue_hand += DelimiterChar;
 
   for (int i; i < Max; i++) // Dump parameters
   {
-    tmpstr = Params[i]; 
-    if (Params[i][0] != NULL)
+    tmpstr = Params[i];
+    if (Params[i][0] != 0)
     {
 
       Glue_hand += tmpstr + DelimiterChar;
@@ -202,20 +205,24 @@ void ParamPart::Glue(char Line[])
   };
 
   Glue_hand += CloseLine; // Close line
-  Line = strcpy(Line, Glue_hand.c_str());
+  return Glue_hand;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void ParamPart::operator<<(char Line[])
 {
-  Slicer(Line);
+  Slicer(&((String)Line));
 }
 
+void ParamPart::operator<<(String Line)
+{
+  Slicer(&Line);
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-char *ParamPart::operator[](uint8_t n) 
+char *ParamPart::operator[](uint8_t n)
 {
   return Params[n];
 }

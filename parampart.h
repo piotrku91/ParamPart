@@ -30,13 +30,12 @@ private:
   void EmptyCut();
 
 public:
-  char Command[MAX_COMMAND_LENGTH];
-  char Params[Max][MAX_PARAM_LENGTH];
+  String Command;
+  String Params[Max];
   bool RType[Max];
   String DebugIntegrityDump;
 
   bool CheckIntegrity = CHECK_INTEGRITY_DEFAULT_STATUS;
-  bool DebugIntegrityEnabled = DEBUG_INTEGRITY_DEFAULT_STATUS;
   bool DebugEnabled = DEBUG_DEFAULT_STATUS;
   char DelimiterChar = ';';
   char OpenLine = '<';
@@ -57,7 +56,7 @@ public:
   // Overload operators
   void operator<<(char Line[]);
   void operator<<(String Line);
-  char *operator[](uint8_t n);
+  String* operator[](uint8_t n);
 
   // Constructors
   ParamPart() { Clear(); };

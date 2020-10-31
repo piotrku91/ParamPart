@@ -30,7 +30,7 @@ ParamPart_Ex Odczyt(&Serial);
 void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
 {
 
-    if ((P->Header("name")) && (P->Integrity(3, STRING, NUMBER, NUMBER)))
+    if ((P->Header("abc")) && P->Integrity(3,STRING,NUMBER,NUMBER))
     {
         P->pnt_Serial->print("Hi ");
         P->pnt_Serial->print(P->Params[0]);
@@ -42,28 +42,6 @@ void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
         P->Readed();
     };
 
-    if ((P->Header("test")) && (P->Integrity(2, NUMBER))) //Example of comparition and return score.
-    {
-        if (atoi(P->Params[0]) > atoi(P->Params[1])) P->Readed(true, "1st is bigger");
-        if (atoi(P->Params[0]) < atoi(P->Params[1])) P->Readed(true, "2nd is bigger");
-        if (atoi(P->Params[0]) == atoi(P->Params[1])) P->Readed(true, "same");
-
-    };
-
-    if ((P->Header("dbg")) && (P->Integrity(1, NUMBER))) //Example of change Debug mode status
-    {
-        if (atoi(P->Params[0]))
-        {
-            P->pnt_Serial->println("Debug on. ");
-          //  P->DebugEnabled = true;
-        }
-        else
-        {
-            P->pnt_Serial->println("Debug off. ");
-           // P->DebugEnabled = false;
-        };
-        P->Readed();
-    };
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

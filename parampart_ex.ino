@@ -9,16 +9,12 @@ v. 2.4
 
 void ParamPart_Ex::SerialChecker(String *newLine)
 {
-    String Dane; // tmp string
-
-    Dane = "#";
 
     while (pnt_Serial->available())
     {
-        Dane = pnt_Serial->readStringUntil(0);
+       *newLine = pnt_Serial->readStringUntil(0);
     };
 
-    *newLine = Dane;
 };
 
 String ParamPart_Ex::RawRead()
@@ -56,11 +52,11 @@ void ParamPart_Ex::HybridRead(void (*ptn_func_interpreter)(ParamPart_Ex *PP))
 
             (*ptn_func_interpreter)(this); // Execute reaction function (callback), push pointer of this class to access from external function.
 
-            if ((DebugIntegrityEnabled) && (DebugIntegrityDump != ""))
-                pnt_Serial->println(DebugIntegrityDump); // Debug Integrity print
-            if ((DebugEnabled) && (!GetReadFlag()))
-                pnt_Serial->println("UC! (" + (String)Command + ")"); // Unknown command print
-            Clear();                                                  // Clear parampart to prepare for the next input.
+            if ((DebugEnabled) && (DebugIntegrityDump != ""))
+                pnt_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
+            if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+                pnt_Serial->println("UC! (" + Command + ")"); // Unknown command print
+            Clear(); // Clear parampart to prepare for the next input.
         }
         else
         { // (SYNTAX ERROR)

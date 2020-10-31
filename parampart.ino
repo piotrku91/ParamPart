@@ -14,7 +14,7 @@ inline void ParamPart::EmptyCut() // Clear unused parameters
   int i = ParamReadedCount;
   while (i < Max)
   {
-    strcpy(Params[i], 0);
+    Params[i] = "";
     i++;
   };
 };
@@ -24,7 +24,7 @@ inline void ParamPart::EmptyCut() // Clear unused parameters
 inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
 {
   ParamReadedCount = 0;
-  strcpy(Command, NULL);
+  Command = "";
   EmptyCut();
   SyntaxTest = false;
   SetReadFlag(false);
@@ -33,8 +33,7 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
 
 bool ParamPart::Header(String CmdName)
 {
-  const char *Cmd = CmdName.c_str();
-  if ((strcmp(Command, Cmd)) == 0)
+  if (Command == CmdName)
   {
     return true;
   };
@@ -42,37 +41,42 @@ bool ParamPart::Header(String CmdName)
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool ParamPart::Slicer(String *LineS) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
+bool ParamPart::Slicer(String *Line) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {
   Clear();
-  //char * Line = new char[LineS->length()];
-  char Line[128];
-  strcpy(Line, LineS->c_str());
+  String LineS = *Line;
   int i = 0; // Split counter
-  char *strtokIndx;
   char DC = DelimiterChar;
-  if ((Line[0] != OpenLine) || (strchr(Line, DC) == 0)) // Check if is syntax (example chars: <   ;   > )
+
+  if ((LineS.indexOf(OpenLine) == -1) || (LineS.indexOf(DC) == -1) || (LineS.indexOf(CloseLine) == -1)) // Check if is syntax (example chars: <   ;   > )
+  // FAIL //
   {
     SyntaxTest = false;
     Clear();
     return false;
-  };
-
-  strtokIndx = strtok(Line, &DC);
-  strcpy(Command, strtokIndx + 1);
-
-  for (; ((strtokIndx != 0) && (i <= Max)); i++)
+  }
+  else
+  // PASS //
   {
-    strtokIndx = strtok(0, &DC);
-    strcpy(Params[i], strtokIndx);
-  };
 
-  i = i - 2; // Remove > char from end
-  ParamReadedCount = i;
-  EmptyCut();
-  SyntaxTest = true;
- // delete Line;
-  return true;
+    int NextDel = LineS.indexOf(DC);       // Find first delimiter
+    Command = LineS.substring(1, NextDel); // Copy command to variable
+    LineS.remove(0, NextDel + 1);          // Delete from the begin to first delimiter + 1
+    NextDel = LineS.indexOf(DC);           // Find next delimiter
+
+    while (NextDel != -1) // Find and assign all parameters
+    {
+      Params[i] = LineS.substring(0, NextDel);
+      LineS.remove(0, NextDel + 1);
+      NextDel = LineS.indexOf(DC);
+      i++; // increment split counter
+    };
+
+    ParamReadedCount = i; // Dump split counter to variable
+    EmptyCut();
+    SyntaxTest = true;
+    return true;
+  }
 };
 
 void ParamPart::CheckParamTypes()
@@ -119,7 +123,7 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
 
   CheckParamTypes();
 
-  if (DebugIntegrityEnabled)
+  if (DebugEnabled)
   {
     // Expected parameters debug
     DebugIntegrityDump = "E: " + (String)Type1 + (String)Type2 + (String)Type3 + (String)Type4 + (String)Type5 + (String)Type6 + (String)Type7 + (String)Type8 + (String)Type9;
@@ -130,13 +134,14 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
     {
       DebugIntegrityDump += RType[i];
     };
+    DebugIntegrityDump += " MM!"; // mismatch parameters
   };
 
   // If some expected parameter dismatch -> fail integrity test.
   if (InputExpectedParams >= 1)
   {
     if (Type1 != RType[0])
-    
+
       return false;
   }
   if (InputExpectedParams >= 2)
@@ -180,12 +185,14 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
       return false;
   }
 
+  DebugIntegrityDump = ""; // if pass integrity test just clean debug
+
   return true; // Parameters match -> Pass integrity test
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::Glue()
+String ParamPart::Glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
 {
   //   Clear();
   String Glue_hand;
@@ -205,24 +212,26 @@ String ParamPart::Glue()
   };
 
   Glue_hand += CloseLine; // Close line
-  return Glue_hand;
+  return Glue_hand;       // Returns remastered line
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart::operator<<(char Line[])
+void ParamPart::operator<<(char Line[]) // Overload << char
 {
-  Slicer(&((String)Line));
+  String tmp = Line;
+  Slicer(&tmp);
 }
 
-void ParamPart::operator<<(String Line)
+void ParamPart::operator<<(String Line) // Overload << String
 {
   Slicer(&Line);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-char *ParamPart::operator[](uint8_t n)
+String *ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
 {
-  return Params[n];
+  String *par_ptr = &Params[n];
+  return par_ptr;
 }

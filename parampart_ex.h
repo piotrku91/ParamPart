@@ -10,14 +10,16 @@ class ParamPart_Ex : public ParamPart
 public:
     HardwareSerial *pnt_Serial;
 
-    void HybridRead(void (*ptn_func_interpreter)(ParamPart_Ex *PP));
+    void HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex *PP));
+    void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex *PP));
     String RawRead();
-    void SerialChecker(String *newLine);
     void Readed(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
 
     // Constructors for extended class
-    ParamPart_Ex(HardwareSerial *WS) : ParamPart(), pnt_Serial(WS){};
-    ParamPart_Ex(HardwareSerial *WS, char OL, char DC, char CL) : ParamPart(OL, DC, CL), pnt_Serial(WS){};
+   // ParamPart_Ex(HardwareSerial *WS) : ParamPart(), pnt_Serial(WS){};
+    ParamPart_Ex() = delete;
+    ParamPart_Ex(HardwareSerial *WS, char OL = '<', char DL = ';', char CL = '>') : 
+    ParamPart(OL, DL, CL), pnt_Serial(WS){};
 };
 
 #endif

@@ -40,7 +40,44 @@ bool ParamPart::Header(String CmdName)
   return false;
 };
 
+bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
+{
+  Clear();
+  int i = 0;
+  char *strtokIndx;
+  char DC = DelimiterChar;
+  if ((strchr(Line, DC) == NULL) || (Line[0]!=OpenLine))
+  {
+    SyntaxTest = false;
+    Clear();
+    return false;
+  };
+
+  strtokIndx = strtok(Line, &DC);
+  char CommandC[24];
+  strcpy(CommandC, strtokIndx+1);
+  Command=CommandC;
+
+   char ParamC[64];
+  for (; ((strtokIndx != NULL) && (i <= Max)); i++)
+  {
+    strtokIndx = strtok(NULL, &DC);
+    strcpy(ParamC, strtokIndx);
+    Params[i]=ParamC;
+  };
+  
+
+  i = i - 2; // Remove > char from end, and cut counter.
+  ParamReadedCount = i;
+  EmptyCut();
+  SyntaxTest = true;
+  return true;
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 bool ParamPart::Slicer(String *Line) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {
   Clear();
@@ -64,7 +101,7 @@ bool ParamPart::Slicer(String *Line) // Main function to split line to command a
     LineS.remove(0, NextDel + 1);          // Delete from the begin to first delimiter + 1
     NextDel = LineS.indexOf(DC);           // Find next delimiter
 
-    while (NextDel != -1) // Find and assign all parameters
+    while ((NextDel != -1) && (i <= Max)) // Find and assign all parameters
     {
       Params[i] = LineS.substring(0, NextDel);
       LineS.remove(0, NextDel + 1);
@@ -89,7 +126,7 @@ void ParamPart::CheckParamTypes()
   for (int i = 0; i < Max; i++)
   {
 
-    for (int z = 0; (z < MAX_PARAM_LENGTH && Params[i][z] != 0); z++)
+    for (int z = 0; (Params[i][z] != 0); z++)
     {
       // Checking char by char what type is there. Just one char changes type to String (it is not integer)
       if (isDigit(Params[i][z]))
@@ -217,11 +254,11 @@ String ParamPart::Glue() // You can modify some parameter and stick full command
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart::operator<<(char Line[]) // Overload << char
-{
-  String tmp = Line;
-  Slicer(&tmp);
-}
+// void ParamPart::operator<<(char Line[]) // Overload << char
+// {
+//   String tmp = Line;
+//   Slicer(&tmp);
+// }
 
 void ParamPart::operator<<(String Line) // Overload << String
 {
@@ -230,8 +267,8 @@ void ParamPart::operator<<(String Line) // Overload << String
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String *ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
+const String ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
 {
-  String *par_ptr = &Params[n];
-  return par_ptr;
+
+  return Params[n];
 }

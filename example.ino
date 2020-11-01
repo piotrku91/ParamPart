@@ -21,6 +21,7 @@ You get respond: Czesc Piotr, podobno masz 23 lat oraz 167 wzrostu.
 void setup()
 {
     Serial.begin(9600);
+    pinMode(LED_BUILTIN,OUTPUT);
 }
 
 ParamPart_Ex Odczyt(&Serial);
@@ -39,6 +40,12 @@ void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
         P->pnt_Serial->print(" years old and ");
         P->pnt_Serial->print(P->Params[2]);
         P->pnt_Serial->println(" cm.  ");
+        P->Readed();
+    };
+
+    if ((P->Header("dw")) && P->Integrity(1,NUMBER))
+    {
+        digitalWrite(LED_BUILTIN, atoi(P->Params[0]));
         P->Readed();
     };
 
@@ -73,10 +80,10 @@ void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
 
 void loop()
 {
-    delay(1000);
+    delay(100);
  
     Odczyt.HybridRead(&Reaction);
 
-    delay(1000);
+   
   //  Serial.println("siema");
 }

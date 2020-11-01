@@ -8,7 +8,6 @@
 #define MAX_COMMAND_LENGTH 16
 #define MAX_PARAMS 9
 #define CHECK_INTEGRITY_DEFAULT_STATUS true
-#define DEBUG_INTEGRITY_DEFAULT_STATUS true
 #define DEBUG_DEFAULT_STATUS true
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,16 +31,16 @@ public:
   char CloseLine;
 
 private:
-  const uint8_t Max = MAX_PARAMS;
-  uint8_t ParamReadedCount = 0;
-  bool SyntaxTest = false;
-  bool ReadFlag = false;
+  const uint8_t Max;
+  uint8_t ParamReadedCount;
+  bool SyntaxTest;
+  bool ReadFlag;
 
   // Public functions
 public:
   void Clear();
   bool Header(String CmdName);
-  bool GetReadFlag() { return ReadFlag; };
+  bool GetReadFlag() const { return ReadFlag; };
   void SetReadFlag(bool NF) { ReadFlag = NF; };
   void Readed() { ReadFlag = true; };
   bool Slicer(String *LineS);
@@ -61,18 +60,18 @@ public:
   // Overload operators
   //void operator<<(char Line[]);
   void operator<<(String Line);
-  const String ParamPart::operator[](uint8_t n);
+  const operator[](uint8_t n);
 
   // Constructors
   ParamPart() : OpenLine('<'), DelimiterChar(';'), CloseLine('>'), DebugIntegrityDump(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-       DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadedCount(0), SyntaxTest(false), ReadFlag(false)
-       {
-Clear();
-       };
+                DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadedCount(0), SyntaxTest(false), ReadFlag(false)
+  {
+    Clear();
+  };
 
   ParamPart(char OL, char DL, char CL)
       : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-       DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadedCount(0), SyntaxTest(false), ReadFlag(false)
+        DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadedCount(0), SyntaxTest(false), ReadFlag(false)
   {
     Clear();
   };

@@ -16,8 +16,7 @@ public:
     void Readed(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
 
     // Constructors for extended class
-   // ParamPart_Ex(HardwareSerial *WS) : ParamPart(), pnt_Serial(WS){};
-    ParamPart_Ex() = delete;
+    ParamPart_Ex() = delete; // disable default constructor
     ParamPart_Ex(HardwareSerial *WS, char OL = '<', char DL = ';', char CL = '>') : 
     ParamPart(OL, DL, CL), pnt_Serial(WS){};
 };

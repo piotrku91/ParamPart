@@ -31,7 +31,7 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   DebugIntegrityDump = "";
 };
 
-bool ParamPart::Header(String CmdName)
+bool ParamPart::Header(String CmdName) // Compare expected command with received command 
 {
   if (Command == CmdName)
   {
@@ -40,13 +40,13 @@ bool ParamPart::Header(String CmdName)
   return false;
 };
 
-bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
+bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C String Version
 {
   Clear();
   int i = 0;
   char *strtokIndx;
   char DC = DelimiterChar;
-  if ((strchr(Line, DC) == NULL) || (Line[0]!=OpenLine))
+  if ((strchr(Line, DC) == 0) || (Line[0] != OpenLine))
   {
     SyntaxTest = false;
     Clear();
@@ -55,17 +55,16 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
 
   strtokIndx = strtok(Line, &DC);
   char CommandC[24];
-  strcpy(CommandC, strtokIndx+1);
-  Command=CommandC;
+  strcpy(CommandC, strtokIndx + 1);
+  Command = CommandC;
 
-   char ParamC[64];
-  for (; ((strtokIndx != NULL) && (i <= Max)); i++)
+  char ParamC[64];
+  for (; ((strtokIndx != 0) && (i <= Max)); i++)
   {
-    strtokIndx = strtok(NULL, &DC);
+    strtokIndx = strtok(0, &DC);
     strcpy(ParamC, strtokIndx);
-    Params[i]=ParamC;
+    Params[i] = ParamC;
   };
-  
 
   i = i - 2; // Remove > char from end, and cut counter.
   ParamReadedCount = i;
@@ -74,9 +73,7 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
   return true;
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 bool ParamPart::Slicer(String *Line) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {

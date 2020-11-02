@@ -1,9 +1,0 @@
-{
-    "programmer": "AVRISP mkII",
-    "board": "arduino:avr:uno",
-    "sketch": "example.ino",
-    "port": "/dev/ttyACM0",
-    "defines": [
-        "USBCON"
-    ]
-}

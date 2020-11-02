@@ -5,13 +5,13 @@
 //                                                                        CLASS ParamParted_Ex  - Header file                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class ParamPart_Ex : public ParamPart
+class ParamPart_Ex : public ParamPart // Extended Arduino Serial Data Splitter
 {
 public:
     HardwareSerial *pnt_Serial;
 
-    void HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex *PP));
-    void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex *PP));
+    void HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex& PP));
+    void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex& PP));
     String RawRead();
     void Readed(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
 

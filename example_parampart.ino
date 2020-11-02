@@ -2,16 +2,14 @@
 // #include "HardwareSerial.h"
 
 // /* 
-// Arduino Serial Data Splitter - ParamPart_Ex Example
+// Arduino Serial Data Splitter - ParamPart Example
 // Written by Piotr Kupczyk (dajmosster@gmail.com) 
 // 2019 - 2020
-// v. 2.4
+// v. 3.2
 
 // Example:
 // Fast implementation of Serial receiving, parsing the data, integrity checks and reaction :)
 
-// Send to Serial: <name;Piotr;23;167;> 
-// You get respond: Czesc Piotr, podobno masz 23 lat oraz 167 wzrostu.
 
 
 // */
@@ -27,7 +25,7 @@
 
 // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// void Reaction() // In this version you need to checks and execute everything and by yourself (SyntaxVerify,Debug,Print by serial)
+// void Reaction() 
 // {
 
 //     if ((OdczytBasic.Header("abc")) && OdczytBasic.Integrity(3,STRING,NUMBER,NUMBER))

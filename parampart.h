@@ -5,16 +5,19 @@
 //                                                                        CLASS ParamParted  - Header file                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAX_COMMAND_LENGTH 16
 #define MAX_PARAMS 9
 #define CHECK_INTEGRITY_DEFAULT_STATUS true
 #define DEBUG_DEFAULT_STATUS true
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define STRING 1
+// Define some helpful const (example to use in program: P.Integrity(2,NUMBER,STRING))
+#define STRING 1   
 #define NUMBER 0
 
-class ParamPart // Klasa paczki odbieranych parametrow
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+class ParamPart // Arduino Serial Data Splitter
 {
 
 public:
@@ -23,9 +26,6 @@ public:
   String DebugIntegrityDump;
 
   bool RType[MAX_PARAMS];
-  bool CheckIntegrity;
-  bool DebugEnabled;
-
   char DelimiterChar;
   char OpenLine;
   char CloseLine;
@@ -36,20 +36,29 @@ private:
   bool SyntaxTest;
   bool ReadFlag;
 
+protected:
+  String tmpnewLine; // Workflow variable
+  bool CheckIntegrity;
+  bool DebugEnabled;
+
   // Public functions
 public:
   void Clear();
   bool Header(String CmdName);
   bool GetReadFlag() const { return ReadFlag; };
-  void SetReadFlag(bool NF) { ReadFlag = NF; };
-  void Readed() { ReadFlag = true; };
-  bool Slicer(String *LineS);
+  String Readed(bool RtnMsg, String ParamRtn, String Rtn);
+  bool Slicer(String& LineS);
   bool CSlicer(char Line[]);
   String Glue();
 
+  //Settings functions
+  void SetReadFlag(bool NF) { ReadFlag = NF; };
+  void SetDebugMode(bool DS) {DebugEnabled = DS;};
+  void SetIntegrityCheck(bool DS) {CheckIntegrity = DS;};
+
   bool SyntaxVerify() { return SyntaxTest; };
   bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0);
-
+  String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
   // Private functions
 
 private:
@@ -58,19 +67,19 @@ private:
 
 public:
   // Overload operators
-  //void operator<<(char Line[]);
-  void operator<<(String Line);
-  const operator[](uint8_t n);
+  void operator<<(char Line[]);
+  void operator<<(String& Line);
+  const String operator[](uint8_t n);
 
   // Constructors
-  ParamPart() : OpenLine('<'), DelimiterChar(';'), CloseLine('>'), DebugIntegrityDump(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+  ParamPart() : OpenLine('<'), DelimiterChar(';'), CloseLine('>'), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
                 DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadedCount(0), SyntaxTest(false), ReadFlag(false)
   {
     Clear();
   };
 
   ParamPart(char OL, char DL, char CL)
-      : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+      : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
         DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadedCount(0), SyntaxTest(false), ReadFlag(false)
   {
     Clear();

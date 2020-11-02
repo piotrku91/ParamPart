@@ -5,7 +5,7 @@
 Arduino Serial Data Splitter - ParamPart_Ex Example
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 2.4
+v. 3.2
 
 Example:
 Fast implementation of Serial receiving, parsing the data, integrity checks and reaction :)
@@ -28,25 +28,25 @@ ParamPart_Ex Odczyt(&Serial);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reaction(ParamPart_Ex *P) // Access to ParamPart_Ex class by pointer
+void Reaction(ParamPart_Ex& P) // Access to ParamPart_Ex class by reference
 {
 
-    if ((P->Header("abc")) && P->Integrity(3, STRING, NUMBER, NUMBER))
+    if ((P.Header("abc")) && P.Integrity(3, STRING, NUMBER, NUMBER))
     {
-        P->pnt_Serial->print("Hi ");
-        P->pnt_Serial->print(P->Params[0]);
-        P->pnt_Serial->print(", you have ");
-        P->pnt_Serial->print(P->Params[1]);
-        P->pnt_Serial->print(" years old and ");
-        P->pnt_Serial->print(P->Params[2]);
-        P->pnt_Serial->println(" cm.  ");
-        P->Readed();
+        P.pnt_Serial->print("Hi ");
+        P.pnt_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.Params[0].
+        P.pnt_Serial->print(", you have ");
+        P.pnt_Serial->print(P[1]);
+        P.pnt_Serial->print(" years old and ");
+        P.pnt_Serial->print(P[2]);
+        P.pnt_Serial->println(" cm.  ");
+        P.Readed();
     };
 
-    if ((P->Header("dw")) && P->Integrity(1, NUMBER))
+    if ((P.Header("dw")) && P.Integrity(1, NUMBER))
     {
-        digitalWrite(LED_BUILTIN, P->Params[0].toInt());
-        P->Readed();
+        digitalWrite(LED_BUILTIN, P[0].toInt());
+        P.Readed();
     };
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +56,12 @@ void loop()
     //delay(150);
 
     Odczyt.HybridInterpreter(&Reaction);
+    delay(2000);
 
-    //  Serial.println("siema");
+
+    // You can put command from your source (like line from file?!) and split as well
+    //Odczyt << "<abc;x;3;3;>";
+   // Odczyt.Interpreter(&Reaction);
+
+
 }

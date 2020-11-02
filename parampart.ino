@@ -4,7 +4,7 @@
 Arduino Serial Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 2.4
+v. 3.2
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,6 +29,7 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   SyntaxTest = false;
   SetReadFlag(false);
   DebugIntegrityDump = "";
+  tmpnewLine="";
 };
 
 bool ParamPart::Header(String CmdName) // Compare expected command with received command 
@@ -75,10 +76,9 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ParamPart::Slicer(String *Line) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
+bool ParamPart::Slicer(String& LineS) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {
-  Clear();
-  String LineS = *Line;
+ // Clear();
   int i = 0; // Split counter
   char DC = DelimiterChar;
 
@@ -224,6 +224,31 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
   return true; // Parameters match -> Pass integrity test
 };
 
+
+String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
+{
+    String tmpReturn="";
+    if (SyntaxVerify())
+    {                                  //   (SYNTAX OK)
+        (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
+
+        if ((DebugEnabled) && (DebugIntegrityDump != ""))
+            tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
+        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+            tmpReturn="UC! (" + Command + ")"; // Unknown command print
+        Clear();                                          // Clear parampart to prepare for the next input.
+    }
+    else
+    { // (SYNTAX ERROR)
+
+        if ((DebugEnabled))
+            tmpReturn="SE!"; // Syntax Error - missing < or ; or >
+    };
+};
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 String ParamPart::Glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
@@ -249,17 +274,26 @@ String ParamPart::Glue() // You can modify some parameter and stick full command
   return Glue_hand;       // Returns remastered line
 };
 
+String ParamPart::Readed(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
+{
+    SetReadFlag(true);
+     if (RtnMsg)
+        return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
+};
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// void ParamPart::operator<<(char Line[]) // Overload << char
-// {
-//   String tmp = Line;
-//   Slicer(&tmp);
-// }
+ void ParamPart::operator<<(char Line[]) // Overload << char[]
+ {
+  tmpnewLine=Line;
+  Slicer(tmpnewLine);
+}
 
-void ParamPart::operator<<(String Line) // Overload << String
+void ParamPart::operator<<(String& Line) // Overload << String
 {
-  Slicer(&Line);
+  tmpnewLine=Line;
+  Slicer(tmpnewLine);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -4,13 +4,12 @@
 Arduino Serial Data Splitter - ParamPart_Ex (Extended Version with Serial Receiver)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 2.4
+v. 3.2
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 String ParamPart_Ex::RawRead() //Returns line from Serial or nothing
 {
-    String tmpnewLine;
 
     while (pnt_Serial->available())
     {
@@ -38,12 +37,12 @@ void ParamPart_Ex::Readed(bool RtnMsg, String ParamRtn, String Rtn) // If comman
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart_Ex::Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex *PP)) // Start interpret object
+void ParamPart_Ex::Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex &PP)) // Start interpret object
 {
 
     if (SyntaxVerify())
     {                                  //   (SYNTAX OK)
-        (*ptn_func_interpreter)(this); // Execute reaction function (callback), push pointer of this class to access from external function.
+        (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
 
         if ((DebugEnabled) && (DebugIntegrityDump != ""))
             pnt_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
@@ -59,12 +58,13 @@ void ParamPart_Ex::Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex *PP)) /
     };
 };
 
-void ParamPart_Ex::HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex *PP)) // Receive Serial line and Start interpret object.
+void ParamPart_Ex::HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex& PP)) // Receive Serial line and Start interpret object.
 {
-    String tmpnewLine = RawRead();
+    RawRead();
+   
     if ((tmpnewLine[0] != '#') && (tmpnewLine != "")) 
     {
-        Slicer(&tmpnewLine);
+        Slicer(tmpnewLine);
         Interpreter(ptn_func_interpreter);
     };
 };

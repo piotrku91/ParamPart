@@ -4,7 +4,7 @@
 Arduino Serial String Data Splitter  - ParamPart_Ex (Extended Version with Serial Receiver)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3
+v. 3.3.1
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22,7 +22,7 @@ String ParamPart_Ex::RawRead() //Returns line from Serial or nothing
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart_Ex::Readed(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
+void ParamPart_Ex::ReadDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
 {
     if (RtnMsg)
         pnt_Serial->println(OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);

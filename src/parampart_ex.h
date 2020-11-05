@@ -14,12 +14,12 @@ public:
     void HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex& PP));
     void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex& PP));
     String RawRead();
-    void Readed(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
+    void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
 
     // Constructors for extended class
     ParamPart_Ex() = delete; // disable default constructor
     ParamPart_Ex(HardwareSerial *WS, char OL = '<', char DL = ';', char CL = '>') : 
-    ParamPart(OL, DL, CL), pnt_Serial(WS){};
+      ParamPart(OL, DL, CL), pnt_Serial(WS){};
 };
 
 #endif

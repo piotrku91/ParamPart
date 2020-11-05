@@ -4,14 +4,14 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3
+v. 3.3.1
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 inline void ParamPart::EmptyCut() // Clear unused parameters
 {
-  int i = ParamReadedCount;
+  int i = ParamReadCount;
   while (i < Max)
   {
     Params[i] = "";
@@ -23,7 +23,7 @@ inline void ParamPart::EmptyCut() // Clear unused parameters
 
 inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
 {
-  ParamReadedCount = 0;
+  ParamReadCount = 0;
   Command = "";
   EmptyCut();
   SyntaxTest = false;
@@ -69,7 +69,7 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
   };
 
   i = i - 2; // Remove > char from end, and cut counter.
-  ParamReadedCount = i;
+  ParamReadCount = i;
   EmptyCut();
   SyntaxTest = true;
   return true;
@@ -107,7 +107,7 @@ bool ParamPart::Slicer(String& LineS) // Main function to split line to command 
       i++; // increment split counter
     };
 
-    ParamReadedCount = i; // Dump split counter to variable
+    ParamReadCount = i; // Dump split counter to variable
     EmptyCut();
     SyntaxTest = true;
     return true;
@@ -148,13 +148,15 @@ void ParamPart::CheckParamTypes()
 
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
+
    if (!CheckIntegrity)
     return true; // If function is disabled just pass integrity test.
-    
-  if (InputExpectedParams != ParamReadedCount)
+  
+
+  if (InputExpectedParams != ParamReadCount)
   {
     if (DebugEnabled)
-      DebugIntegrityDump = "MEP"; // Missing expected parameters
+      DebugIntegrityDump = "MEP"; // Missing/Extra expected parameters
     return false;                 // Fail integrity test.
   };
  
@@ -279,7 +281,7 @@ String ParamPart::Glue() // You can modify some parameter and stick full command
   return Glue_hand;       // Returns remastered line
 };
 
-String ParamPart::Readed(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
+String ParamPart::ReadDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
 {
     SetReadFlag(true);
      if (RtnMsg)

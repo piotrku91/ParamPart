@@ -1,6 +1,7 @@
 #ifndef PARAMPART_H
 #define PARAMPART_H
 
+#include <Arduino.h>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                        CLASS ParamParted  - Header file                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,9 +45,10 @@ protected:
   // Public functions
 public:
   void Clear();
-  bool Header(String CmdName);
+  bool Header(const String& CmdName);
+  bool Header(String& CmdName);
   bool GetReadFlag() const { return ReadFlag; };
-  String Readed(bool RtnMsg, String ParamRtn, String Rtn);
+  String Readed(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
   bool Slicer(String& LineS);
   bool CSlicer(char Line[]);
   String Glue();
@@ -67,6 +69,7 @@ private:
 
 public:
   // Overload operators
+  void operator<<(const char Line[]);
   void operator<<(char Line[]);
   void operator<<(String& Line);
   const String operator[](uint8_t n);

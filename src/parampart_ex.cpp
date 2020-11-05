@@ -1,10 +1,10 @@
 #include "parampart_ex.h"
 
 /* 
-Arduino Serial Data Splitter - ParamPart_Ex (Extended Version with Serial Receiver)
+Arduino Serial String Data Splitter  - ParamPart_Ex (Extended Version with Serial Receiver)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.2
+v. 3.3
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -16,14 +16,8 @@ String ParamPart_Ex::RawRead() //Returns line from Serial or nothing
         tmpnewLine = pnt_Serial->readStringUntil(0);
     };
 
-    if (tmpnewLine[0] != '#') // If first line is # just return nothing
-    {
-        return tmpnewLine;
-    }
-    else
-    {
-        return "";
-    };
+    return (tmpnewLine[0] != '#') ? tmpnewLine : ""; // If first line is # just return nothing
+    
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

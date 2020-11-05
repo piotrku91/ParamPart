@@ -1,10 +1,10 @@
 #include "parampart.h"
 
 /* 
-Arduino Serial Data Splitter - ParamPart
+Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.2
+v. 3.3
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,13 +32,14 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   tmpnewLine="";
 };
 
-bool ParamPart::Header(String CmdName) // Compare expected command with received command 
+bool ParamPart::Header(const String& CmdName) // Compare expected command with received command 
 {
-  if (Command == CmdName)
-  {
-    return true;
-  };
-  return false;
+return (Command==CmdName) ? true : false;
+};
+
+bool ParamPart::Header(String& CmdName) // Compare expected command with received command 
+{
+return (Command==CmdName) ? true : false;
 };
 
 bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C String Version
@@ -117,7 +118,7 @@ void ParamPart::CheckParamTypes()
 {
   for (int i = 0; i < Max; i++) // Clear types
   {
-    RType[i] = 0;
+    RType[i] = 0; // Set types default to NUMBER
   };
 
   for (int i = 0; i < Max; i++)
@@ -125,19 +126,21 @@ void ParamPart::CheckParamTypes()
 
     for (int z = 0; (Params[i][z] != 0); z++)
     {
+
       // Checking char by char what type is there. Just one char changes type to String (it is not integer)
-      if (isDigit(Params[i][z]))
+      if ((isDigit(Params[i][z])) || (Params[i][0]=='-') || ((Params[i][z]=='.') && (Params[i][0]!='.')))
       {
-        if (RType[i] == 1)
-          RType[i] = 1; // Type = String (TEKST)
-        else
-          RType[i] = 0; // Tyoe = Integer (LICZBA)
+        RType[i] = (RType[i] == 1) ? 1 : 0; // 1 - STRING, 0 - NUMBER
       }
       else
       {
         RType[i] = 1;
       };
+
+
     };
+
+
   };
 };
 
@@ -145,15 +148,16 @@ void ParamPart::CheckParamTypes()
 
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
-
+   if (!CheckIntegrity)
+    return true; // If function is disabled just pass integrity test.
+    
   if (InputExpectedParams != ParamReadedCount)
   {
     if (DebugEnabled)
       DebugIntegrityDump = "MEP"; // Missing expected parameters
     return false;                 // Fail integrity test.
   };
-  if (!CheckIntegrity)
-    return true; // If function is disabled just pass integrity test.
+ 
 
   CheckParamTypes();
 
@@ -244,6 +248,7 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
         if ((DebugEnabled))
             tmpReturn="SE!"; // Syntax Error - missing < or ; or >
     };
+    return tmpReturn;
 };
 
 
@@ -283,6 +288,12 @@ String ParamPart::Readed(bool RtnMsg, String ParamRtn, String Rtn) // If command
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ void ParamPart::operator<<(const char Line[]) // Overload << const char[]
+ {
+  tmpnewLine=Line;
+  Slicer(tmpnewLine);
+}
 
  void ParamPart::operator<<(char Line[]) // Overload << char[]
  {

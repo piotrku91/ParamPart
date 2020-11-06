@@ -4,7 +4,7 @@ Arduino Serial String Data Splitter  - ParamPart / ParamPart_Ex
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 
 2019 - 2020
-v. 3.3
+v. 3.3.1b
 
 **It's easy to put in your prototype project and debug, send, receiver parameters by string lines.**
 
@@ -116,59 +116,61 @@ and get some return <artn;abc;OK;>
 ParamPart Reader('<',';','>') - You can customize syntax by yourself from the begin (or later by function)
 
 
-##### Main functions (ParamPart_Ex)
+#### Main functions (ParamPart_Ex)
 
-** String HybridInterpreter(void (*ptn_func_interpreter)(ParamPart &PP)) ** - Read String from Serial, send to Slice() function, checks syntax and later call function from pointer (Reaction function).
+**String HybridInterpreter(void (*ptn_func_interpreter)(ParamPart &PP))** - Read String from Serial, send to Slice() function, checks syntax and later call function from pointer (Reaction function).
 
-** void Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) **  - Checks syntax, and call function from pointer. (Reaction function)
+**void Interpreter(void (*ptn_func_interpreter)(ParamPart &PP))**  - Checks syntax, and call function from pointer. (Reaction function)
 
-** String RawRead() ** - Read String from Serial and store in tmpnewLine variable. (No interpreting)
+**String RawRead()** - Read String from Serial and store in tmpnewLine variable. (No interpreting)
 
-** void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn") ** - Set ReadFlag as true, and create some return message (In this version it's going straight away to Serial)
+**void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version it's going straight away to Serial)
 
 
-##### Main functions (ParamPart)
+#### Main functions (ParamPart)
 
-** String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) **  - Checks syntax, and call function from pointer. But in this version function returns String with Flag about reaction process or nothing if everything is OK. (Reaction function)
+**String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP))**  - Checks syntax, and call function from pointer. But in this version function returns String with Flag about reaction process or nothing if everything is OK. (Reaction function)
 
-** void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn") ** - Set ReadFlag as true, and create some return message (In this version function returns only string)
+**void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version function returns only string)
 
 
 ##### Main functions (both)
 
-** bool Slicer(String& LineS) ** - Parse String by designated syntax.
+**bool Slicer(String& LineS)** - Parse String by designated syntax.
 
-**  bool CSlicer(char Line[]) ** - Parse CString by designated syntax. (Old version of function).
+**bool CSlicer(char Line[])** - Parse CString by designated syntax. (Old version of function).
 
-**  bool Header(const String& CmdName); ** - Compare received command with expected command and returns score. 
+**bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0)** - Check amount of parameters, data types inside and compare with expected types. 
 
-**  String Glue(); ** - Create String line from actual object variables (inversion).
+**bool Header(const String& CmdName)** - Compare received command with expected command and returns score. 
 
-**  Clear(); ** - Clean object and prepare to next String line.
+**String Glue()** - Create String line from actual object variables (inversion).
 
-
-##### Return Flags after Reaction() function.
-
-SE - Syntax Error
-
-MEP - Missing/Extra Parameter
-
-UC - Unknown Command
-
-MM - Mismatch between received and expected parameters.
-
-Nothing - Everything OK :)
+**Clear()** - Clean object and prepare to next String line.
 
 
+#### Return Flags after Reaction() function.
 
-##### Settings and other functions
+**SE** - Syntax Error
 
-** SetDebugMode(bool DebugStatus) ** - Enable/Disable debug return.
+**MEP** - Missing/Extra Parameter
 
-** SetIntegrityCheck(bool IntegrityStatus) ** - Enable/Disable Integrity checks. (Pass everything)
+**UC** - Unknown Command
 
-** SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine) ** - Customize your syntax as you like
+**MM** - Mismatch between received and expected parameters.
 
-** bool GetReadFlag() ** - Returns if some reaction is done.
+**Nothing** - Everything OK :)
 
-** bool GetParam(n) ** - Returns parameter with index n (it's same like in example: P[n])
+
+
+#### Settings and other functions
+
+**SetDebugMode(bool DebugStatus)** - Enable/Disable debug return.
+
+**SetIntegrityCheck(bool IntegrityStatus)** - Enable/Disable Integrity checks. (Pass everything)
+
+**SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine)** - Customize your syntax as you like
+
+**bool GetReadFlag()** - Returns if some reaction is done.
+
+**bool GetParam(n)** - Returns parameter with index n (it's same like in example: P[n])

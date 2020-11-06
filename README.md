@@ -116,7 +116,7 @@ and get some return <artn;abc;OK;>
 ParamPart Reader('<',';','>') - You can customize syntax by yourself from the begin (or later by function)
 
 
-#### Main functions (ParamPart_Ex)
+## Main functions (ParamPart_Ex)
 
 **String HybridInterpreter(void (*ptn_func_interpreter)(ParamPart &PP))** - Read String from Serial, send to Slice() function, checks syntax and later call function from pointer (Reaction function).
 
@@ -127,18 +127,18 @@ ParamPart Reader('<',';','>') - You can customize syntax by yourself from the be
 **void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version it's going straight away to Serial)
 
 
-#### Main functions (ParamPart)
+## Main functions (ParamPart)
 
 **String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP))**  - Checks syntax, and call function from pointer. But in this version function returns String with Flag about reaction process or nothing if everything is OK. (Reaction function)
 
 **void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version function returns only string)
 
 
-##### Main functions (both)
+## Main functions (both)
 
-**bool Slicer(String& LineS)** - Parse String by designated syntax.
+**bool Slicer(String& LineS)** - Parse String by designated syntax and store in ParamPart object.
 
-**bool CSlicer(char Line[])** - Parse CString by designated syntax. (Old version of function).
+**bool CSlicer(char Line[])** - Parse CString by designated syntax and store in ParamPart object. (Old version of function).
 
 **bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0)** - Check amount of parameters, data types inside and compare with expected types. 
 
@@ -149,7 +149,7 @@ ParamPart Reader('<',';','>') - You can customize syntax by yourself from the be
 **Clear()** - Clean object and prepare to next String line.
 
 
-#### Return Flags after Reaction() function.
+## Return Flags after Reaction() function.
 
 **SE** - Syntax Error
 
@@ -163,7 +163,7 @@ ParamPart Reader('<',';','>') - You can customize syntax by yourself from the be
 
 
 
-#### Settings and other functions
+## Settings and other functions
 
 **SetDebugMode(bool DebugStatus)** - Enable/Disable debug return.
 

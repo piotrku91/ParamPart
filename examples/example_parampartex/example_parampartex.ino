@@ -69,9 +69,9 @@ void Reaction(ParamPart_Ex &P) // Access to ParamPart_Ex class by reference
         if (P[0] < P[1])
             Serial.print("2nd");
         if (P[0] == P[1])
-            Serial.println("same");
+            P.pnt_Serial->println("same");
         else
-            Serial.println(" is bigger");
+            P.pnt_Serial->println(" is bigger");
 
         int sum = (P[0].toInt() + P[1].toInt()); // Do some example maths and return as parameter.
         P.ReadDone(true, static_cast<String>(sum));

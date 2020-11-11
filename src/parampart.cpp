@@ -4,7 +4,9 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3.1
+v. 3.3.4
+
+Github: https://github.com/piotrku91/ParamPart/
 */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,12 +36,12 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
 
 bool ParamPart::Header(const String& CmdName) // Compare expected command with received command 
 {
-return (Command==CmdName) ? true : false;
+return (Command==CmdName);
 };
 
 bool ParamPart::Header(String& CmdName) // Compare expected command with received command 
 {
-return (Command==CmdName) ? true : false;
+return (Command==CmdName);
 };
 
 bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C String Version
@@ -144,8 +146,6 @@ void ParamPart::CheckParamTypes()
   };
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
 
@@ -229,6 +229,8 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
 
   return true; // Parameters match -> Pass integrity test
 };
+
+
 
 
 String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.

@@ -2,10 +2,12 @@
 #include "HardwareSerial.h"
 
 /* 
-Arduino Serial String Data Splitter  - ParamPart_Ex Example
+Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3.1
+v. 3.3.4
+
+Github: https://github.com/piotrku91/ParamPart/
 
  In this version (ParamPart_Ex) you need to pass just pointer to Serial object and everything is controlled inside,  
  use just Reaction function to easy work :)
@@ -34,7 +36,7 @@ ParamPart_Ex Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Seri
 void Reaction(ParamPart_Ex &P) // Access to ParamPart_Ex class by reference
 {
 
-    if ((P.Header("abc")) && P.Integrity(3, STRING, NUMBER, NUMBER))
+    if ((P.Header("abc")) && P.Integrity(3,STRING, NUMBER, NUMBER))
     {
         P.pnt_Serial->print("Hi ");
         P.pnt_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
@@ -48,21 +50,21 @@ void Reaction(ParamPart_Ex &P) // Access to ParamPart_Ex class by reference
                       // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
 
-    if ((P.Header("dw")) && P.Integrity(1, NUMBER)) // Simple digitalWrite example
+    if ((P.Header("dw")) && P.Integrity(1,NUMBER)) // Simple digitalWrite example
     {
         // If pass integrity checks, i'm not scared to conversion P[0] to int.
         digitalWrite(LED_BUILTIN, (P[0].toInt()));
         P.ReadDone();
     };
 
-    if ((P.Header("db")) && P.Integrity(1, NUMBER)) // Change debug mode
+    if ((P.Header("db")) && P.Integrity(1,NUMBER)) // Change debug mode
     {
 
         P.SetDebugMode(P[0].toInt());
         P.ReadDone();
     };
 
-    if ((P.Header("cmp")) && P.Integrity(2, NUMBER, NUMBER)) // Compare and send sum by return example
+    if ((P.Header("cmp")) && P.EIntegrity(NUMBER, NUMBER)) // Compare and send sum by return example (Expanded version test)
     {
         if (P[0] > P[1])
             Serial.print("1st");
@@ -82,6 +84,5 @@ void Reaction(ParamPart_Ex &P) // Access to ParamPart_Ex class by reference
 void loop()
 {
     delay(100);
-
     Odczyt.HybridInterpreter(&Reaction);
 }

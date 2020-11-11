@@ -3,12 +3,13 @@ Arduino Serial String Data Splitter  - ParamPart / ParamPart_Ex
 
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 
+Tested on Arduino Uno and Arduino Mega.
+Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
+
 2019 - 2020
-v. 3.3
+v. 3.3.4
 
-**It's easy to put in your prototype project and debug, send, receiver parameters by string lines.**
-
-
+**It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 
 
 Example:
@@ -106,7 +107,7 @@ Use just Reaction function in your program to easy work or do everything by your
   Example:
   Fast implementation of parsing the data, integrity checks and reaction :)
   
-Send to ParamPart: <abc;peter;23;167;> ( from Serial or Script file, whatever you want :) )
+Send to ParamPart: <abc;peter;23;167;> ( from Serial, i2c, Script file, whatever you want :) )
 
 You get respond: Hi peter, you have 23 years old and 167 cm.  (Instead of this you can do something)
 and get some return <artn;abc;OK;>
@@ -141,6 +142,10 @@ ParamPart Reader('<',';','>') - You can customize syntax by yourself from the be
 **  bool CSlicer(char Line[]) ** - Parse CString by designated syntax. (Old version of function).
 
 **  bool Header(const String& CmdName); ** - Compare received command with expected command and returns score. 
+
+**  bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0); ** - Check types of input and expected parameters. Return false if is any mismatch. 
+
+**  template<typename... TPack> bool EIntegrity(TPack&&... args) ** - Check types of input and expected parameters. Return false if is any mismatch. Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS in parampart header file). Don't need specify of amount expected parameters. 
 
 **  String Glue(); ** - Create String line from actual object variables (inversion).
 

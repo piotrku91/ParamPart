@@ -5,7 +5,7 @@
   Arduino Serial Serial Data Splitter - ParamPart Basic Example
   Written by Piotr Kupczyk (dajmosster@gmail.com) 
   2019 - 2020
-  v. 3.3.1
+  v. 3.3.4
 
  In this version you need to pass String to ParamPart Object manualy from Serial or Script file, whatever you want :) 
  
@@ -62,7 +62,8 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
   {
       delay(150);
        // Example with Serial: if (Serial.available()) {String txt=Serial.readStringUntil(0);}; OdczytBasic << txt; 
-      OdczytBasic << "<abc;peter;33;223;>"; // Push some line inside from Serial, variable, file etc. (<< overloaded - instead of Slicer(String&)) 
+
+      OdczytBasic << "<abc;peter;33;223;>"; // Push some line inside from Serial, i2c, variable, file etc. (<< overloaded - instead of Slicer(String&)) 
       
       
       String ScoreFlag = OdczytBasic.Interpreter(&Reaction); // Read by reaction function and read the return flag.

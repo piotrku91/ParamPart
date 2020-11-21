@@ -1,12 +1,16 @@
 #ifndef PARAMPART_H
 #define PARAMPART_H
-#include <Arduino.h>
+
+#include <string>
+#include <cstring>
 
 /* 
-Arduino Serial String Data Splitter - ParamPart
+Arduino Serial String Data Splitter - ParamPart_pcs (PC SIDE PORT)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
 v. 3.3.6
+
+Port version to use on PC side.
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -19,17 +23,17 @@ Github: https://github.com/piotrku91/ParamPart/
 #define CHECK_INTEGRITY_DEFAULT_STATUS true
 #define DEBUG_DEFAULT_STATUS true
 
-// Define some helpful const (example to use in program: P.Integrity(2,NUMBER,STRING))
+// Define some helpful const (example to use in program: P.Integrity(2,NUMBER,std::string))
 #define STRING 1   
 #define NUMBER 0
 
 
-class ParamPart // Arduino String Serial Data Splitter
+class ParamPart // Arduino std::string Serial Data Splitter
 {
 
 public:
-  String Command;
-  String DebugIntegrityDump;
+  std::string Command;
+  std::string DebugIntegrityDump;
 
  
 
@@ -41,8 +45,8 @@ private:
   
 
 protected:
-  String Params[MAX_PARAMS];
-  String tmpnewLine; // Workflow variable
+  std::string Params[MAX_PARAMS];
+  std::string tmpnewLine; // Workflow variable
   bool CheckIntegrity;
   bool DebugEnabled;
   bool RType[MAX_PARAMS];
@@ -53,12 +57,12 @@ protected:
   // Public functions
 public:
   void Clear();
-  bool Header(const String& CmdName);
-  bool Header(String& CmdName);
-  String ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
-  bool Slicer(String& LineS);
+  bool Header(const std::string& CmdName);
+  bool Header(std::string& CmdName);
+  std::string ReadDone(bool RtnMsg = true, std::string ParamRtn = "OK", std::string Rtn = "artn");
+  bool Slicer(std::string& LineS);
   bool CSlicer(char Line[]);
-  String Glue();
+  std::string Glue();
 
   //Settings functions
   void SetReadFlag(bool NewFlag) { ReadFlag = NewFlag; };
@@ -67,11 +71,11 @@ public:
   void SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine) {this->OpenLine=OpenLine; this->DelimiterChar=DelimiterChar;this->CloseLine=CloseLine;};
 
   bool GetReadFlag() const { return ReadFlag; };
-  const String GetParam(uint8_t n) const {return Params[n];};
+  const std::string GetParam(uint8_t n) const {return Params[n];};
   bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0);
   bool SyntaxVerify() { return SyntaxTest; };
 
-  String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
+  std::string Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
   // Private functions
 
 private:
@@ -82,8 +86,8 @@ public:
   // Overload operators
   void operator<<(const char Line[]);
   void operator<<(char Line[]);
-  void operator<<(String& Line);
-  const String operator[](uint8_t n);
+  void operator<<(std::string& Line);
+  const std::string operator[](uint8_t n);
 
   // Constructors
   ParamPart() : OpenLine('<'), DelimiterChar(';'), CloseLine('>'), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
@@ -107,7 +111,7 @@ void ArgAccess(const int& Amount, uint8_t& Counter, bool& tmpITest, uint8_t Type
 {
     if ((Counter <= Amount-1) && (Counter <= Max))
     {
-          if (DebugEnabled){DebugIntegrityDump+=static_cast<String>(TypeExp);}; 
+          if (DebugEnabled){DebugIntegrityDump+=std::to_string(TypeExp);}; 
           if (TypeExp==RType[Counter] && (tmpITest)) {tmpITest=true;} else {tmpITest=false;}; // Examine
         Counter++;
     };

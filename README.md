@@ -7,7 +7,7 @@ Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
 
 2019 - 2020
-v. 3.3.4
+v. 3.3.6
 
 **It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 
@@ -69,11 +69,13 @@ And you can do something by Reaction function:
 
 
 
-Two libraries:
+Three libraries:
 
-ParamPart_Ex - Extended version with Serial control.
+ParamPart_Ex - Extended version with Serial control. (parampart_ex.h)
 
-ParamPart - Normal basic version with no Serial control.
+ParamPart - Normal basic version with no Serial control. (parampart.h)
+
+ParamPart (PCS) - Normal basic version to use on PC side (port). (parampart_pcs.h)
 
 
 ## ParamPart_Ex

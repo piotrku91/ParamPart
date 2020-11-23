@@ -4,6 +4,13 @@
 #include <string>
 #include <cstring>
 
+#define QSTRING_SERVICE 1 // Enable / Disable Qt Enviroment type QString instead of std::string in access methods
+
+#if QSTRING_SERVICE
+#include <QString>
+#endif
+
+
 /* 
 Arduino Serial String Data Splitter - ParamPart_pcs (PC SIDE PORT)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
@@ -16,7 +23,7 @@ Github: https://github.com/piotrku91/ParamPart/
 */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                                                        CLASS ParamPart  - Header file                                                                      //
+//                                                                        CLASS ParamPart_PCS  - Header file                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define MAX_PARAMS 9
@@ -26,6 +33,10 @@ Github: https://github.com/piotrku91/ParamPart/
 // Define some helpful const (example to use in program: P.Integrity(2,NUMBER,STRING))
 #define STRING 1   
 #define NUMBER 0
+
+//
+
+class TManager;
 
 
 class ParamPart // Arduino std::string Serial Data Splitter
@@ -75,7 +86,9 @@ public:
   bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0);
   bool SyntaxVerify() { return SyntaxTest; };
 
-  std::string Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
+
+  std::string Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)); //for Global or static function reaction function
+  std::string Interpreter(TManager *M, void (TManager::*ptn_func_interpreter)(ParamPart &PP)); //for class member reaction function
   // Private functions
 
 private:
@@ -86,8 +99,20 @@ public:
   // Overload operators
   void operator<<(const char Line[]);
   void operator<<(char Line[]);
-  void operator<<(std::string& Line);
+  void operator<<(const std::string& Line);
+
+
+#if QSTRING_SERVICE
+
+  void operator<<(const QString& Line);
+  const QString operator[](uint8_t n);
+
+#else
+
   const std::string operator[](uint8_t n);
+
+
+#endif
 
   // Constructors
 

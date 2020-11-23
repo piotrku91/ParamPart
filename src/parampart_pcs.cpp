@@ -37,15 +37,20 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   tmpnewLine="";
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool ParamPart::Header(const std::string& CmdName) // Compare expected command with received command 
 {
 return (Command==CmdName);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool ParamPart::Header(std::string& CmdName) // Compare expected command with received command 
 {
 return (Command==CmdName);
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C std::string Version
 {
@@ -119,6 +124,8 @@ bool ParamPart::Slicer(std::string& LineS) // Main function to split line to com
   }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void ParamPart::CheckParamTypes()
 {
   for (int i = 0; i < Max; i++) // Clear types
@@ -148,6 +155,7 @@ void ParamPart::CheckParamTypes()
 
   };
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
@@ -233,14 +241,66 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
   return true; // Parameters match -> Pass integrity test
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////// Interpreter functions//////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////Version for class member reaction function///////////////////////////
+
+// Example execution from TManager class:
+/*
+
+    typedef void (TManager::*ReaPTR)(ParamPart &PP);
+    ReaPTR MemberReactionPointer= &TManager::Reaction;
+    m_ParamPart_ptr->Interpreter(this,MemberReactionPointer);
+
+*/
+
+std::string ParamPart::Interpreter(TManager *M,void (TManager::*ptn_func_interpreter)(ParamPart &PP)) // This overloaded version for cooperate with class member function.
+   { std::string tmpReturn="";
+    if (SyntaxVerify())
+    {                                  //   (SYNTAX OK)6
+        (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
+
+        if ((DebugEnabled) && (DebugIntegrityDump != ""))
+            tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
+        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+            tmpReturn="UC! (" + Command + ")"; // Unknown command print
+        Clear();                                          // Clear parampart to prepare for the next input.
+    }
+    else
+    { // (SYNTAX ERROR)
+
+        if ((DebugEnabled))
+            tmpReturn="SE!"; // Syntax Error - missing < or ; or >
+    };
+    return tmpReturn;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////Version for global or static reaction function///////////////////////////
+///
+/// // Example execution from main or static function
+/*
+
+    ParamPart Reader;
+    Reader << "<somecomand;2;>";
+    Reader.Interpreter(&Reaction);
+
+    .... see readme ....
+
+*/
 
 
 std::string ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only std::string with score.
 {
     std::string tmpReturn="";
     if (SyntaxVerify())
-    {                                  //   (SYNTAX OK)
+    {                                  //   (SYNTAX OK)6
         (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
 
         if ((DebugEnabled) && (DebugIntegrityDump != ""))
@@ -260,7 +320,7 @@ std::string ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) 
 
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::string ParamPart::Glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
@@ -291,7 +351,7 @@ std::string ParamPart::ReadDone(bool RtnMsg, std::string ParamRtn, std::string R
     SetReadFlag(true);
      if (RtnMsg){
         return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);};
-     return "";
+        return "";
 };
 
 
@@ -309,7 +369,7 @@ std::string ParamPart::ReadDone(bool RtnMsg, std::string ParamRtn, std::string R
   Slicer(tmpnewLine);
 }
 
-void ParamPart::operator<<(std::string& Line) // Overload << std::string
+void ParamPart::operator<<(const std::string& Line) // Overload << std::string
 {
   tmpnewLine=Line;
   Slicer(tmpnewLine);
@@ -317,8 +377,33 @@ void ParamPart::operator<<(std::string& Line) // Overload << std::string
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+#if QSTRING_SERVICE
+
+void ParamPart::operator<<(const QString& Line) // Overload << std::string
+{
+  tmpnewLine=Line.toStdString();
+  Slicer(tmpnewLine);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const QString ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
+{
+
+  return QString::fromStdString(Params[n]);
+}
+
+
+#else
+
 const std::string ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
 {
 
   return Params[n];
 }
+
+
+
+
+#endif

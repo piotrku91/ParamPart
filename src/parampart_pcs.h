@@ -23,7 +23,7 @@ Github: https://github.com/piotrku91/ParamPart/
 #define CHECK_INTEGRITY_DEFAULT_STATUS true
 #define DEBUG_DEFAULT_STATUS true
 
-// Define some helpful const (example to use in program: P.Integrity(2,NUMBER,std::string))
+// Define some helpful const (example to use in program: P.Integrity(2,NUMBER,STRING))
 #define STRING 1   
 #define NUMBER 0
 
@@ -50,8 +50,8 @@ protected:
   bool CheckIntegrity;
   bool DebugEnabled;
   bool RType[MAX_PARAMS];
-  char DelimiterChar;
   char OpenLine;
+  char DelimiterChar;
   char CloseLine;
 
   // Public functions
@@ -68,7 +68,7 @@ public:
   void SetReadFlag(bool NewFlag) { ReadFlag = NewFlag; };
   void SetDebugMode(bool DebugStatus) {DebugEnabled = DebugStatus;};
   void SetIntegrityCheck(bool IntegrityStatus) {CheckIntegrity = IntegrityStatus;};
-  void SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine) {this->OpenLine=OpenLine; this->DelimiterChar=DelimiterChar;this->CloseLine=CloseLine;};
+  void SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine) {this->OpenLine=OpenLine; this->DelimiterChar=Delimiter;this->CloseLine=CloseLine;};
 
   bool GetReadFlag() const { return ReadFlag; };
   const std::string GetParam(uint8_t n) const {return Params[n];};
@@ -90,15 +90,15 @@ public:
   const std::string operator[](uint8_t n);
 
   // Constructors
-  ParamPart() : OpenLine('<'), DelimiterChar(';'), CloseLine('>'), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-                DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false)
+
+  ParamPart() : DebugIntegrityDump(""),Max(MAX_PARAMS),ParamReadCount(0),SyntaxTest(false), ReadFlag(false), tmpnewLine(""), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS), DebugEnabled(DEBUG_DEFAULT_STATUS),OpenLine('<'), DelimiterChar(';'), CloseLine('>')
+
   {
     Clear();
-  };
+  };//
 
   ParamPart(char OL, char DL, char CL)
-      : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-        DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false)
+      : DebugIntegrityDump(""),Max(MAX_PARAMS),ParamReadCount(0),SyntaxTest(false), ReadFlag(false), tmpnewLine(""), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS), DebugEnabled(DEBUG_DEFAULT_STATUS),OpenLine(OL), DelimiterChar(DL), CloseLine(CL)
   {
     Clear();
   };

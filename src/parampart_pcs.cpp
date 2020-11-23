@@ -100,7 +100,7 @@ bool ParamPart::Slicer(std::string& LineS) // Main function to split line to com
   {
 
     int NextDel = LineS.find(DC);       // Find first delimiter
-    Command = LineS.substr(1, NextDel); // Copy command to variable
+    Command = LineS.substr(1, NextDel-1); // Copy command to variable
     LineS.erase(0, NextDel + 1);          // Delete from the begin to first delimiter + 1
     NextDel = LineS.find(DC);           // Find next delimiter
 

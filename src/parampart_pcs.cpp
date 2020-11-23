@@ -88,7 +88,7 @@ bool ParamPart::Slicer(std::string& LineS) // Main function to split line to com
   int i = 0; // Split counter
   char DC = DelimiterChar;
 
-  if ((LineS.find(OpenLine) == -1) || (LineS.find(DC) == -1) || (LineS.find(CloseLine) == -1)) // Check if is syntax (example chars: <   ;   > )
+  if ((LineS.find(OpenLine) == std::string::npos) || (LineS.find(DC) == std::string::npos) || (LineS.find(CloseLine) == std::string::npos)) // Check if is syntax (example chars: <   ;   > )
   // FAIL //
   {
     SyntaxTest = false;
@@ -272,7 +272,7 @@ std::string ParamPart::Glue() // You can modify some parameter and stick full co
   Glue_hand = OpenLine + Command; // Dump command
   Glue_hand += DelimiterChar;
 
-  for (int i; i < Max; i++) // Dump parameters
+  for (int i=0; i < Max; i++) // Dump parameters
   {
     tmpstr = Params[i];
     if (Params[i][0] != 0)
@@ -289,9 +289,9 @@ std::string ParamPart::Glue() // You can modify some parameter and stick full co
 std::string ParamPart::ReadDone(bool RtnMsg, std::string ParamRtn, std::string Rtn) // If command code done
 {
     SetReadFlag(true);
-     if (RtnMsg)
-        return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
-        return "";
+     if (RtnMsg){
+        return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);};
+     return "";
 };
 
 

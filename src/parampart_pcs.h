@@ -70,6 +70,7 @@ public:
   void Clear();
   bool Header(const std::string& CmdName);
   bool Header(std::string& CmdName);
+  bool UseAsHeader(const std::string& CmdName,uint8_t ParamIndex=0);
   std::string ReadDone(bool RtnMsg = true, std::string ParamRtn = "OK", std::string Rtn = "artn");
   bool Slicer(std::string& LineS);
   bool CSlicer(char Line[]);

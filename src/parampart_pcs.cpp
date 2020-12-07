@@ -37,15 +37,27 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   tmpnewLine="";
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool ParamPart::Header(const std::string& CmdName) // Compare expected command with received command 
 {
 return (Command==CmdName);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool ParamPart::UseAsHeader(const std::string& CmdName,uint8_t ParamIndex)
+{
+return (Params[ParamIndex]==CmdName);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool ParamPart::Header(std::string& CmdName) // Compare expected command with received command 
 {
 return (Command==CmdName);
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C std::string Version
 {
@@ -88,7 +100,7 @@ bool ParamPart::Slicer(std::string& LineS) // Main function to split line to com
   int i = 0; // Split counter
   char DC = DelimiterChar;
 
-  if ((LineS.find(OpenLine) == -1) || (LineS.find(DC) == -1) || (LineS.find(CloseLine) == -1)) // Check if is syntax (example chars: <   ;   > )
+  if ((LineS.find(OpenLine) == std::string::npos) || (LineS.find(DC) == std::string::npos) || (LineS.find(CloseLine) == std::string::npos)) // Check if is syntax (example chars: <   ;   > )
   // FAIL //
   {
     SyntaxTest = false;
@@ -119,6 +131,8 @@ bool ParamPart::Slicer(std::string& LineS) // Main function to split line to com
   }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void ParamPart::CheckParamTypes()
 {
   for (int i = 0; i < Max; i++) // Clear types
@@ -148,6 +162,7 @@ void ParamPart::CheckParamTypes()
 
   };
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
@@ -233,14 +248,36 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
   return true; // Parameters match -> Pass integrity test
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////// Interpreter functions//////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////Version for global or static reaction function///////////////////////////
+///
+/// // Example execution from main or static function
+/*
+
+    ParamPart Reader;
+    Reader << "<somecomand;2;>";
+    Reader.Interpreter(&Reaction);
+
+    .... see readme ....
+
+*/
 
 
 std::string ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only std::string with score.
 {
     std::string tmpReturn="";
     if (SyntaxVerify())
-    {                                  //   (SYNTAX OK)
+    {                                  //   (SYNTAX OK)6
         (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
 
         if ((DebugEnabled) && (DebugIntegrityDump != ""))
@@ -260,7 +297,7 @@ std::string ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) 
 
 
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::string ParamPart::Glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
@@ -272,7 +309,7 @@ std::string ParamPart::Glue() // You can modify some parameter and stick full co
   Glue_hand = OpenLine + Command; // Dump command
   Glue_hand += DelimiterChar;
 
-  for (int i; i < Max; i++) // Dump parameters
+  for (int i=0; i < Max; i++) // Dump parameters
   {
     tmpstr = Params[i];
     if (Params[i][0] != 0)
@@ -289,8 +326,8 @@ std::string ParamPart::Glue() // You can modify some parameter and stick full co
 std::string ParamPart::ReadDone(bool RtnMsg, std::string ParamRtn, std::string Rtn) // If command code done
 {
     SetReadFlag(true);
-     if (RtnMsg)
-        return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
+     if (RtnMsg){
+        return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);};
         return "";
 };
 
@@ -309,7 +346,7 @@ std::string ParamPart::ReadDone(bool RtnMsg, std::string ParamRtn, std::string R
   Slicer(tmpnewLine);
 }
 
-void ParamPart::operator<<(std::string& Line) // Overload << std::string
+void ParamPart::operator<<(const std::string& Line) // Overload << std::string
 {
   tmpnewLine=Line;
   Slicer(tmpnewLine);
@@ -317,8 +354,33 @@ void ParamPart::operator<<(std::string& Line) // Overload << std::string
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+#if QSTRING_SERVICE
+
+void ParamPart::operator<<(const QString& Line) // Overload << std::string
+{
+  tmpnewLine=Line.toStdString();
+  Slicer(tmpnewLine);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const QString ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
+{
+
+  return QString::fromStdString(Params[n]);
+}
+
+
+#else
+
 const std::string ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
 {
 
   return Params[n];
 }
+
+
+
+
+#endif

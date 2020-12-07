@@ -28,9 +28,9 @@ class ParamPart // Arduino String Serial Data Splitter
 {
 
 public:
-  String Command;
+  
   String DebugIntegrityDump;
-
+  String RawCopy;
  
 
 private:
@@ -38,7 +38,7 @@ private:
   uint8_t ParamReadCount;
   bool SyntaxTest; 
   bool ReadFlag;
-  
+
 
 protected:
   String Params[MAX_PARAMS];
@@ -49,12 +49,17 @@ protected:
   char DelimiterChar;
   char OpenLine;
   char CloseLine;
+  String Command;
 
   // Public functions
 public:
   void Clear();
   bool Header(const String& CmdName);
   bool Header(String& CmdName);
+  const String GetCommand() {return Command;};
+  const String GetFullCommand() {return OpenLine+Command+DelimiterChar;};
+  const String GetCloseLine() {return static_cast<String>(DelimiterChar)+static_cast<String>(CloseLine);};
+  bool UseAsHeader(const String& CmdName,uint8_t ParamIndex=0);
   String ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
   bool Slicer(String& LineS);
   bool CSlicer(char Line[]);
@@ -90,6 +95,7 @@ public:
                 DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false)
   {
     Clear();
+    
   };
 
   ParamPart(char OL, char DL, char CL)
@@ -100,7 +106,10 @@ public:
   };
 
 ///////////////////////////////////////////////////// TEMPLATES - FUNCTIONS /////////////////////////////////////////////////////////////////
-// Expanded version of integrity
+
+/*                                                  Expanded version of integrity
+
+ */
 struct PassF_TPack {template<typename... T> PassF_TPack(T...) {}};
 
 void ArgAccess(const int& Amount, uint8_t& Counter, bool& tmpITest, uint8_t TypeExp)
@@ -150,6 +159,42 @@ DebugIntegrityDump = ""; // if pass integrity test just clean debug (delete defa
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+/*                                      Special template for Reaction Function from class member
+
+  CALL EXAMPLE:
+  For example - Reaction function is a member of MainSetter class (MainSetter::Reaction).
+
+  typedef void (MainSetter::*ReactPTR)(ParamPart &PP);
+  ReactPTR MemberReactionPointer= &MainSetter::Reaction;
+  OdczytParted.Interpreter(this,MemberReactionPointer);
+
+
+*/
+template <typename T> 
+String Interpreter(T *M,void (T::*ptn_func_interpreter)(ParamPart &PP))  // This version of function returns only string with score.
+{
+    String tmpReturn="";
+    if (SyntaxVerify())
+    {                                  //   (SYNTAX OK)
+          (M->*ptn_func_interpreter)(*this);// Execute reaction function (callback), push pointer of this class to access from external function.
+
+        if ((DebugEnabled) && (DebugIntegrityDump != ""))
+            tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
+        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+            tmpReturn="UC! (" + Command + ")"; // Unknown command print
+        Clear();                                          // Clear parampart to prepare for the next input.
+    }
+    else
+    { // (SYNTAX ERROR)
+
+        if ((DebugEnabled))
+            tmpReturn="SE!"; // Syntax Error - missing < or ; or >
+    };
+    return tmpReturn;
 };
+
+
+};
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #endif

@@ -4,6 +4,13 @@
 #include <string>
 #include <cstring>
 
+#define QSTRING_SERVICE 1 // Enable / Disable Qt Enviroment type QString instead of std::string in access methods
+
+#if QSTRING_SERVICE
+#include <QString>
+#endif
+
+
 /* 
 Arduino Serial String Data Splitter - ParamPart_pcs (PC SIDE PORT)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
@@ -16,7 +23,7 @@ Github: https://github.com/piotrku91/ParamPart/
 */
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                                                        CLASS ParamPart  - Header file                                                                      //
+//                                                                        CLASS ParamPart_PCS  - Header file                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define MAX_PARAMS 9
@@ -27,15 +34,17 @@ Github: https://github.com/piotrku91/ParamPart/
 #define STRING 1   
 #define NUMBER 0
 
+//
+
+class TManager;
+
 
 class ParamPart // Arduino std::string Serial Data Splitter
 {
 
 public:
-  std::string Command;
   std::string DebugIntegrityDump;
 
- 
 
 private:
   const uint8_t Max;
@@ -53,12 +62,18 @@ protected:
   char OpenLine;
   char DelimiterChar;
   char CloseLine;
+  std::string Command;
+
 
   // Public functions
 public:
   void Clear();
   bool Header(const std::string& CmdName);
   bool Header(std::string& CmdName);
+  const std::string GetCommand() {return Command;};
+  const std::string GetFullCommand() {return OpenLine+Command+DelimiterChar;};
+  const std::string  GetCloseLine() {return std::string(DelimiterChar,CloseLine);};
+  bool UseAsHeader(const std::string& CmdName,uint8_t ParamIndex=0);
   std::string ReadDone(bool RtnMsg = true, std::string ParamRtn = "OK", std::string Rtn = "artn");
   bool Slicer(std::string& LineS);
   bool CSlicer(char Line[]);
@@ -75,7 +90,9 @@ public:
   bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0);
   bool SyntaxVerify() { return SyntaxTest; };
 
-  std::string Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
+
+  std::string Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)); //for Global or static function reaction function
+ // std::string Interpreter(TManager *M, void (TManager::*ptn_func_interpreter)(ParamPart &PP)); //for class member reaction function
   // Private functions
 
 private:
@@ -86,8 +103,20 @@ public:
   // Overload operators
   void operator<<(const char Line[]);
   void operator<<(char Line[]);
-  void operator<<(std::string& Line);
+  void operator<<(const std::string& Line);
+
+
+#if QSTRING_SERVICE
+
+  void operator<<(const QString& Line);
+  const QString operator[](uint8_t n);
+
+#else
+
   const std::string operator[](uint8_t n);
+
+
+#endif
 
   // Constructors
 
@@ -153,6 +182,38 @@ DebugIntegrityDump = ""; // if pass integrity test just clean debug (delete defa
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+///////////////////////////////////////Version for class member reaction function///////////////////////////
+
+// Example execution from TManager class:
+/*
+
+    typedef void (TManager::*ReaPTR)(ParamPart &PP);
+    ReaPTR MemberReactionPointer= &TManager::Reaction;
+    m_ParamPart_ptr->Interpreter(this,MemberReactionPointer);
+
+*/
+template <typename T>
+std::string Interpreter(T *M,void (T::*ptn_func_interpreter)(ParamPart &PP)) // This overloaded version for cooperate with class member function.
+   { std::string tmpReturn="";
+    if (SyntaxVerify())
+    {                                  //   (SYNTAX OK)6
+        (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
+
+        if ((DebugEnabled) && (DebugIntegrityDump != ""))
+            tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
+        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+            tmpReturn="UC! (" + Command + ")"; // Unknown command print
+        Clear();                                          // Clear parampart to prepare for the next input.
+    }
+    else
+    { // (SYNTAX ERROR)
+
+        if ((DebugEnabled))
+            tmpReturn="SE!"; // Syntax Error - missing < or ; or >
+    };
+    return tmpReturn;
+};
 
 };
 

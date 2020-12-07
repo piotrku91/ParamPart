@@ -11,11 +11,18 @@ v. 3.3.6
 String ParamPart_Ex::RawRead() //Returns line from Serial or nothing
 {
 
-    while (pnt_Serial->available())
+    if (pnt_Serial->available())
     {
         tmpnewLine = pnt_Serial->readStringUntil(0);
+         
     };
+   // RawCopy=tmpnewLine;
+   // if (RawCopy!="") {
+    
+   // pnt_Serial->println(RawCopy);
 
+  //  };
+  
     return (tmpnewLine[0] != '#') ? tmpnewLine : ""; // If first line is # just return nothing
     
 };

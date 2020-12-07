@@ -43,10 +43,8 @@ class ParamPart // Arduino std::string Serial Data Splitter
 {
 
 public:
-  std::string Command;
   std::string DebugIntegrityDump;
 
- 
 
 private:
   const uint8_t Max;
@@ -64,12 +62,17 @@ protected:
   char OpenLine;
   char DelimiterChar;
   char CloseLine;
+  std::string Command;
+
 
   // Public functions
 public:
   void Clear();
   bool Header(const std::string& CmdName);
   bool Header(std::string& CmdName);
+  const std::string GetCommand() {return Command;};
+  const std::string GetFullCommand() {return OpenLine+Command+DelimiterChar;};
+  const std::string  GetCloseLine() {return std::string(DelimiterChar,CloseLine);};
   bool UseAsHeader(const std::string& CmdName,uint8_t ParamIndex=0);
   std::string ReadDone(bool RtnMsg = true, std::string ParamRtn = "OK", std::string Rtn = "artn");
   bool Slicer(std::string& LineS);
@@ -89,7 +92,7 @@ public:
 
 
   std::string Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)); //for Global or static function reaction function
-  std::string Interpreter(TManager *M, void (TManager::*ptn_func_interpreter)(ParamPart &PP)); //for class member reaction function
+ // std::string Interpreter(TManager *M, void (TManager::*ptn_func_interpreter)(ParamPart &PP)); //for class member reaction function
   // Private functions
 
 private:
@@ -179,6 +182,38 @@ DebugIntegrityDump = ""; // if pass integrity test just clean debug (delete defa
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+///////////////////////////////////////Version for class member reaction function///////////////////////////
+
+// Example execution from TManager class:
+/*
+
+    typedef void (TManager::*ReaPTR)(ParamPart &PP);
+    ReaPTR MemberReactionPointer= &TManager::Reaction;
+    m_ParamPart_ptr->Interpreter(this,MemberReactionPointer);
+
+*/
+template <typename T>
+std::string Interpreter(T *M,void (T::*ptn_func_interpreter)(ParamPart &PP)) // This overloaded version for cooperate with class member function.
+   { std::string tmpReturn="";
+    if (SyntaxVerify())
+    {                                  //   (SYNTAX OK)6
+        (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
+
+        if ((DebugEnabled) && (DebugIntegrityDump != ""))
+            tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
+        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+            tmpReturn="UC! (" + Command + ")"; // Unknown command print
+        Clear();                                          // Clear parampart to prepare for the next input.
+    }
+    else
+    { // (SYNTAX ERROR)
+
+        if ((DebugEnabled))
+            tmpReturn="SE!"; // Syntax Error - missing < or ; or >
+    };
+    return tmpReturn;
+};
 
 };
 

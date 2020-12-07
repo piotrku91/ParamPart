@@ -256,37 +256,7 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
 
 
 
-///////////////////////////////////////Version for class member reaction function///////////////////////////
 
-// Example execution from TManager class:
-/*
-
-    typedef void (TManager::*ReaPTR)(ParamPart &PP);
-    ReaPTR MemberReactionPointer= &TManager::Reaction;
-    m_ParamPart_ptr->Interpreter(this,MemberReactionPointer);
-
-*/
-
-std::string ParamPart::Interpreter(TManager *M,void (TManager::*ptn_func_interpreter)(ParamPart &PP)) // This overloaded version for cooperate with class member function.
-   { std::string tmpReturn="";
-    if (SyntaxVerify())
-    {                                  //   (SYNTAX OK)6
-        (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
-
-        if ((DebugEnabled) && (DebugIntegrityDump != ""))
-            tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
-        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
-            tmpReturn="UC! (" + Command + ")"; // Unknown command print
-        Clear();                                          // Clear parampart to prepare for the next input.
-    }
-    else
-    { // (SYNTAX ERROR)
-
-        if ((DebugEnabled))
-            tmpReturn="SE!"; // Syntax Error - missing < or ; or >
-    };
-    return tmpReturn;
-};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////Version for global or static reaction function///////////////////////////

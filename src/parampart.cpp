@@ -4,7 +4,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3.6
+v. 3.3.8
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -34,15 +34,15 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   tmpnewLine="";
 };
 
-bool ParamPart::Header(const String& CmdName) // Compare expected command with received command 
+bool ParamPart::Header(const String& CmdName,bool Active) // Compare expected command with received command 
 {
+  if (Active) {
+    if (!(Export_func==nullptr)) (*Export_func)(CmdName);
 return (Command==CmdName);
+  }
+  return false;
 };
 
-bool ParamPart::Header(String& CmdName) // Compare expected command with received command 
-{
-return (Command==CmdName);
-};
 
 bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C String Version
 {
@@ -239,7 +239,7 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
     if (SyntaxVerify())
     {                                  //   (SYNTAX OK)
         (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
-
+         if (!(Export_func==nullptr)) UnSetExportFunction();
         if ((DebugEnabled) && (DebugIntegrityDump != ""))
             tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
         if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))

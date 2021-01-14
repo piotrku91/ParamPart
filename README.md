@@ -7,7 +7,7 @@ Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
 
 2019 - 2020
-v. 3.3.6
+v. 3.3.8
 
 **It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 
@@ -75,7 +75,7 @@ ParamPart_Ex - Extended version with Serial control. (parampart_ex.h)
 
 ParamPart - Normal basic version with no Serial control. (parampart.h)
 
-ParamPart (PCS) - Normal basic version to use on PC side (port). (parampart_pcs.h)
+ParamPart (PCS) - Normal basic version to use on PC side (port). (Is in another repository)
 
 
 ## ParamPart_Ex
@@ -96,9 +96,6 @@ and get some return <artn;abc;OK;>
 ParamPart_Ex Reader(&Serial) - That's need pointer to Serial object to work properly.
 
 ParamPart_Ex Reader(&Serial,'<',';','>') - You can customize syntax by yourself from the begin (or later by function)
-
-
-
 
 
 ## ParamPart
@@ -138,6 +135,8 @@ ParamPart Reader('<',';','>') - You can customize syntax by yourself from the be
 
 
 ## Main functions (both)
+
+**bool Header(const String& CmdName,bool& Active)** - Checks if input Command is one of defined Reaction blocks command.
 
 **bool Slicer(String& LineS)** - Parse String by designated syntax and store in ParamPart object.
 

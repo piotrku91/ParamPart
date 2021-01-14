@@ -6,7 +6,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3.6
+v. 3.3.8
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -50,16 +50,15 @@ protected:
   char OpenLine;
   char CloseLine;
   String Command;
+  void (*Export_func)(const String&) ;
 
   // Public functions
 public:
   void Clear();
-  bool Header(const String& CmdName);
-  bool Header(String& CmdName);
+  bool Header(const String& CmdName,bool Active=true);
   const String GetCommand() {return Command;};
   const String GetFullCommand() {return OpenLine+Command+DelimiterChar;};
   const String GetCloseLine() {return static_cast<String>(DelimiterChar)+static_cast<String>(CloseLine);};
-  bool UseAsHeader(const String& CmdName,uint8_t ParamIndex=0);
   String ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
   bool Slicer(String& LineS);
   bool CSlicer(char Line[]);
@@ -70,6 +69,8 @@ public:
   void SetDebugMode(bool DebugStatus) {DebugEnabled = DebugStatus;};
   void SetIntegrityCheck(bool IntegrityStatus) {CheckIntegrity = IntegrityStatus;};
   void SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine) {this->OpenLine=OpenLine; this->DelimiterChar=DelimiterChar;this->CloseLine=CloseLine;};
+  void SetExportFunction(void (*External_Export_func)(const String&)) { Export_func=External_Export_func; CheckIntegrity=false;};   
+  void UnSetExportFunction() { Export_func=nullptr; CheckIntegrity=true;}; 
 
   bool GetReadFlag() const { return ReadFlag; };
   const String GetParam(uint8_t n) const {return Params[n];};
@@ -92,7 +93,7 @@ public:
 
   // Constructors
   ParamPart() : OpenLine('<'), DelimiterChar(';'), CloseLine('>'), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-                DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false)
+                DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false), Export_func(nullptr)
   {
     Clear();
     
@@ -100,7 +101,7 @@ public:
 
   ParamPart(char OL, char DL, char CL)
       : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-        DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false)
+        DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false), Export_func(nullptr)
   {
     Clear();
   };
@@ -177,7 +178,7 @@ String Interpreter(T *M,void (T::*ptn_func_interpreter)(ParamPart &PP))  // This
     if (SyntaxVerify())
     {                                  //   (SYNTAX OK)
           (M->*ptn_func_interpreter)(*this);// Execute reaction function (callback), push pointer of this class to access from external function.
-
+        if (!(Export_func==nullptr)) UnSetExportFunction();
         if ((DebugEnabled) && (DebugIntegrityDump != ""))
             tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
         if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))

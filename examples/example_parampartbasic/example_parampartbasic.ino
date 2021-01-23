@@ -31,6 +31,19 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
   void Reaction(ParamPart& P) 
   {
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    if (P.Header("test")) // Simple example of respond
+    {
+         Serial.println("Hi!");
+        P.ReadDone();
+    };
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    if (P.Header("test2"), false) // Simple example of respond (If second argument is false, this block of reaction is deactivated)
+    {
+         Serial.println("Hi!");
+        P.ReadDone();
+    };
+    ////////////////////////////////////////////////////////////////////////////////////////////////
        if ((P.Header("abc")) && P.Integrity(3, STRING, NUMBER, NUMBER))
     {
         Serial.print("Hi ");
@@ -45,13 +58,14 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
                     // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     if ((P.Header("dw")) && P.Integrity(1,NUMBER))  //Simple digitalWrite example
     {
         // If pass integrity checks, i'm not scared to conversion P[0] to int.
         digitalWrite(LED_BUILTIN, (P[0].toInt()));
         P.ReadDone();
     }; 
- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

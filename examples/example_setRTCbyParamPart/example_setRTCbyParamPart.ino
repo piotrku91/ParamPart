@@ -6,7 +6,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3.6
+v. 3.4.1
 
 Github: https://github.com/piotrku91/ParamPart/
 
@@ -19,14 +19,14 @@ Example:
 
 Depedencies:
 DS3231 - https://github.com/NorthernWidget/DS3231
-DS3231Plus (My small Extension of DS3231) -
+DS3231Plus (My small Extension of DS3231) - https://github.com/piotrku91/DS3231Plus
 Wire - Library supports i2c
 
 */
 //
 
 DS3231Plus Clock;
-ParamPart_Ex Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
+ParamPart_Ex <> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
 
 void DoSomething()
 {
@@ -43,7 +43,7 @@ void setup()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reaction(ParamPart_Ex &P) // Access to ParamPart_Ex class by reference
+void Reaction(ParamPart_Ex <> &P) // Access to ParamPart_Ex class by reference
 {
 
     if (P.Header("delay")) // Delay

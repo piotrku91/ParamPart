@@ -27,6 +27,7 @@ And you can do something by Reaction function:
        void Reaction(ParamPart& P) 
        {
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
        if ((P.Header("abc")) && P.Integrity(3, STRING, NUMBER, NUMBER))
     {
         Serial.print("Hi ");
@@ -40,6 +41,7 @@ And you can do something by Reaction function:
         P.ReadDone();
     };
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     if ((P.Header("db")) && P.Integrity(1, NUMBER)) // Change debug mode
     {
@@ -48,6 +50,7 @@ And you can do something by Reaction function:
         P.ReadDone();
     };
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     if ((P.Header("cmp")) && P.Integrity(2, NUMBER, NUMBER)) // Compare and send sum by return example
     {
@@ -63,8 +66,8 @@ And you can do something by Reaction function:
         int sum = (P[0].toInt() + P[1].toInt()); // Do some example maths and return as parameter.
         P.ReadDone(true, static_cast<String>(sum));
     };
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     };
-
 
 
 
@@ -75,7 +78,7 @@ ParamPart_Ex - Extended version with Serial control. (parampart_ex.h)
 
 ParamPart - Normal basic version with no Serial control. (parampart.h)
 
-ParamPart (PCS) - Normal basic version to use on PC side (port). (Is in another repository)
+ParamPart (PCS) - Normal basic version to use on PC side (port). It is compatibility to use with Qt (It is in another repository).
 
 
 ## ParamPart_Ex
@@ -93,10 +96,16 @@ and get some return <artn;abc;OK;>
 
 **Creating object**
 
-ParamPart_Ex Reader(&Serial) - That's need pointer to Serial object to work properly.
+ParamPart_Ex is template which allow to build object with internal support of Serial. It takes type of Serial type (Hardware/Software) as template argument.
 
-ParamPart_Ex Reader(&Serial,'<',';','>') - You can customize syntax by yourself from the begin (or later by function)
+Examples of create ParamPart_Ex object:
+ParamPart_Ex <> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as constructor argument and HardwareSerial as template argument. (Default is HardwareSerial)
 
+ParamPart_Ex <HardwareSerial> Odczyt(&Serial); // Equal to ParamPart_Ex <> Odczyt(&Serial);
+
+ParamPart_Ex <SoftwareSerial> Odczyt2(&SerialSoft); // Create object ParamPart_Ex with pointer to Serial as constructor argument and SoftwareSerial as template argument. (SoftwareSerial version)
+
+ParamPart_Ex <> Odczyt(&Serial,'@',';','!'); // Version with overloaded syntax (open line, delimiter, close line)
 
 ## ParamPart
 
@@ -113,7 +122,9 @@ and get some return <artn;abc;OK;>
 
 **Creating object**
 
-ParamPart Reader('<',';','>') - You can customize syntax by yourself from the begin (or later by function)
+ParamPart Reader; // Basic version of ParamPart object. Ready to work.
+
+ParamPart Reader('<',';','>') - // Version with overloaded syntax (open line, delimiter, close line)
 
 
 ## Main functions (ParamPart_Ex)
@@ -144,11 +155,7 @@ ParamPart Reader('<',';','>') - You can customize syntax by yourself from the be
 
 **bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0)** - Check amount of parameters, data types inside and compare with expected types. 
 
-**  bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0); ** - Check types of input and expected parameters. Return false if is any mismatch. 
-
 **  template<typename... TPack> bool EIntegrity(TPack&&... args) ** - Check types of input and expected parameters. Return false if is any mismatch. Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS in parampart header file). Don't need specify of amount expected parameters. 
-
-**  String Glue(); ** - Create String line from actual object variables (inversion).
 
 **String Glue()** - Create String line from actual object variables (inversion).
 
@@ -174,6 +181,8 @@ ParamPart Reader('<',';','>') - You can customize syntax by yourself from the be
 **SetDebugMode(bool DebugStatus)** - Enable/Disable debug return.
 
 **SetIntegrityCheck(bool IntegrityStatus)** - Enable/Disable Integrity checks. (Pass everything)
+
+**SetExportFunction(*External_Export_func)(const String&))** - Enable function for dump all reaction commands. After Reaction function is reset to nullptr.
 
 **SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine)** - Customize your syntax as you like
 

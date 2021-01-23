@@ -5,7 +5,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.3.6
+v. 3.4.1
 
 Github: https://github.com/piotrku91/ParamPart/
 
@@ -38,7 +38,7 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
     
   };
 
-  ParamPart_Ex Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
+  ParamPart_Ex <> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
 
 void setup()
 {
@@ -51,7 +51,7 @@ void setup()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reaction(ParamPart_Ex &P) // Access to ParamPart_Ex class by reference
+void Reaction(ParamPart_Ex <> &P) // Access to ParamPart_Ex class by reference
 {
 
       if (P.Header("ex"))  // Export implemented commands (Headers). Should be first block in Reaction function to dump everything.

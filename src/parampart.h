@@ -78,8 +78,8 @@ public:
   bool SyntaxVerify() { return SyntaxTest; };
 
   String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
+ 
   // Private functions
-
 private:
   void CheckParamTypes();
   void EmptyCut();

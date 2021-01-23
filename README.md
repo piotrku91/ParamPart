@@ -99,13 +99,14 @@ and get some return <artn;abc;OK;>
 ParamPart_Ex is template which allow to build object with internal support of Serial. It takes type of Serial type (Hardware/Software) as template argument.
 
 Examples of create ParamPart_Ex object:
-ParamPart_Ex <> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as constructor argument and HardwareSerial as template argument. (Default is HardwareSerial)
 
-ParamPart_Ex <HardwareSerial> Odczyt(&Serial); // Equal to ParamPart_Ex <> Odczyt(&Serial);
+**ParamPart_Ex <> Odczyt(&Serial);** // Create object ParamPart_Ex with pointer to Serial as constructor argument and HardwareSerial as template argument. (Default is HardwareSerial)
 
-ParamPart_Ex <SoftwareSerial> Odczyt2(&SerialSoft); // Create object ParamPart_Ex with pointer to Serial as constructor argument and SoftwareSerial as template argument. (SoftwareSerial version)
+**ParamPart_Ex <HardwareSerial>** Odczyt(&Serial); // Equal to ParamPart_Ex <> Odczyt(&Serial);
 
-ParamPart_Ex <> Odczyt(&Serial,'@',';','!'); // Version with overloaded syntax (open line, delimiter, close line)
+**ParamPart_Ex <SoftwareSerial> Odczyt2(&SerialSoft);** // Create object ParamPart_Ex with pointer to Serial as constructor argument and SoftwareSerial as template argument. (SoftwareSerial version)
+
+**ParamPart_Ex <> Odczyt(&Serial,'@',';','!');** // Version with overloaded syntax (open line, delimiter, close line)
 
 ## ParamPart
 
@@ -122,16 +123,16 @@ and get some return <artn;abc;OK;>
 
 **Creating object**
 
-ParamPart Reader; // Basic version of ParamPart object. Ready to work.
+**ParamPart Reader;** // Basic version of ParamPart object. Ready to work.
 
-ParamPart Reader('<',';','>') - // Version with overloaded syntax (open line, delimiter, close line)
+**ParamPart Reader('<',';','>')** - // Version with overloaded syntax (open line, delimiter, close line)
 
 
 ## Main functions (ParamPart_Ex)
 
-**String HybridInterpreter(void (*ptn_func_interpreter)(ParamPart &PP))** - Read String from Serial, send to Slice() function, checks syntax and later call function from pointer (Reaction function).
+**String HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex <> &PP))** - Read String from Serial, send to Slice() function, checks syntax and later call function from pointer (Reaction function).
 
-**void Interpreter(void (*ptn_func_interpreter)(ParamPart &PP))**  - Checks syntax, and call function from pointer. (Reaction function)
+**void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex <> &PP))**  - Checks syntax, and call function from pointer. (Reaction function)
 
 **String RawRead()** - Read String from Serial and store in tmpnewLine variable. (No interpreting)
 

@@ -4,7 +4,7 @@
 Arduino Serial String Data Splitter  - ParamPart_Ex (Extended Version with Serial Receiver)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.4.1
+v. 3.4.2
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename SerialType>

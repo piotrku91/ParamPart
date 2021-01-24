@@ -5,7 +5,7 @@
   Arduino Serial Serial Data Splitter - ParamPart Basic Example
   Written by Piotr Kupczyk (dajmosster@gmail.com) 
   2019 - 2020
-  v. 3.3.6
+  v. 3.4.2
 
  In this version you need to pass String to ParamPart Object manualy from Serial or Script file, whatever you want :) 
  
@@ -25,8 +25,6 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
   }
 
   ParamPart OdczytBasic;
-
- 
 
   void Reaction(ParamPart& P) 
   {
@@ -53,6 +51,8 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
         Serial.print(" years old and ");
         Serial.print(P[2]);
         Serial.println(" cm.  ");
+
+         for (auto& pa : P) { Serial.println(pa); }; // Print all parameters by range-based loop.
         
         P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
                     // Always use this function after finish your reaction block. It's setting ReadFlag.

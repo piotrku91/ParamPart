@@ -7,7 +7,7 @@ Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
 
 2019 - 2020
-v. 3.3.8
+v. 3.4.2
 
 **It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 
@@ -102,7 +102,7 @@ Examples of create ParamPart_Ex object:
 
 **ParamPart_Ex <> Odczyt(&Serial);** // Create object ParamPart_Ex with pointer to Serial as constructor argument and HardwareSerial as template argument. (Default is HardwareSerial)
 
-**ParamPart_Ex <HardwareSerial>** Odczyt(&Serial); // Equal to ParamPart_Ex <> Odczyt(&Serial);
+**ParamPart_Ex <HardwareSerial> Odczyt(&Serial);** // Equal to ParamPart_Ex <> Odczyt(&Serial);
 
 **ParamPart_Ex <SoftwareSerial> Odczyt2(&SerialSoft);** // Create object ParamPart_Ex with pointer to Serial as constructor argument and SoftwareSerial as template argument. (SoftwareSerial version)
 

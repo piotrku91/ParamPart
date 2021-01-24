@@ -1,12 +1,12 @@
 #include "parampart_ex.h"
-#include "parampart_ex.cpp" // Include cpp file as well for create and link all functions from library.
+#include "parampart_ex.cpp" // Include cpp file as well for create and link all functions from template.
 #include "SoftwareSerial.h" // For use ParamPart_Ex with Software Serial
 
 /* 
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.4.1
+v. 3.4.2
 
 Github: https://github.com/piotrku91/ParamPart/
 
@@ -71,6 +71,8 @@ void Reaction(ParamPart_Ex <SoftwareSerial> &P) // Access to ParamPart_Ex object
         P.pnt_Serial->print(" years old and ");
         P.pnt_Serial->print(P[2]);
         P.pnt_Serial->println(" cm.  ");
+
+         for (auto& pa : P) {  P.pnt_Serial->println(pa); }; // Print all parameters by range-based loop.
 
         P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
                       // Always use this function after finish your reaction block. It's setting ReadFlag.

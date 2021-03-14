@@ -4,8 +4,8 @@
   /* 
   Arduino Serial Serial Data Splitter - ParamPart Basic Example
   Written by Piotr Kupczyk (dajmosster@gmail.com) 
-  2019 - 2020
-  v. 3.4.2
+  2019 - 2021
+  v. 3.4.3
 
  In this version you need to pass String to ParamPart Object manualy from Serial or Script file, whatever you want :) 
  
@@ -39,6 +39,13 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
     if (P.Header("test2"), false) // Simple example of respond (If second argument is false, this block of reaction is deactivated)
     {
          Serial.println("Hi!");
+        P.ReadDone();
+    };
+     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        if (P.Header("js")) // Example of export ParamPart parameters to JSON format
+    {
+        P.pnt_Serial->println(P.toJSON());
         P.ReadDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////

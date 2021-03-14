@@ -13,8 +13,8 @@ Github: https://github.com/piotrku91/ParamPart/
 
 inline void ParamPart::EmptyCut() // Clear unused parameters
 {
-  int i = ParamReadCount;
-  while (i < Max)
+  int i = m_ParamReadCount;
+  while (i < m_Max)
   {
     Params[i] = "";
     i++;
@@ -25,24 +25,29 @@ inline void ParamPart::EmptyCut() // Clear unused parameters
 
 inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
 {
-  ParamReadCount = 0;
+  m_ParamReadCount = 0;
   Command = "";
   EmptyCut();
-  SyntaxTest = false;
+  m_SyntaxTest = false;
   SetReadFlag(false);
   DebugIntegrityDump = "";
-  tmpnewLine="";
+  tmpnewLine = "";
 };
 
-bool ParamPart::Header(const String& CmdName,bool Active) // Compare expected command with received command 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool ParamPart::Header(const String &CmdName, bool Active) // Compare expected command with received command
 {
-  if (Active) {
-    if (!(Export_func==nullptr)) (*Export_func)(CmdName);
-return (Command==CmdName);
+  if (Active)
+  {
+    if (!(Export_func == nullptr))
+      (*Export_func)(CmdName); // If export function is active, send command to external function for dump.
+    return (Command == CmdName);
   }
   return false;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C String Version
 {
@@ -52,7 +57,7 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
   char DC = DelimiterChar;
   if ((strchr(Line, DC) == 0) || (Line[0] != OpenLine))
   {
-    SyntaxTest = false;
+    m_SyntaxTest = false;
     Clear();
     return false;
   };
@@ -63,7 +68,7 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
   Command = CommandC;
 
   char ParamC[64];
-  for (; ((strtokIndx != 0) && (i <= Max)); i++)
+  for (; ((strtokIndx != 0) && (i < m_Max)); i++)
   {
     strtokIndx = strtok(0, &DC);
     strcpy(ParamC, strtokIndx);
@@ -71,24 +76,24 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
   };
 
   i = i - 2; // Remove > char from end, and cut counter.
-  ParamReadCount = i;
+  m_ParamReadCount = i;
   EmptyCut();
-  SyntaxTest = true;
+  m_SyntaxTest = true;
   return true;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ParamPart::Slicer(String& LineS) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
+bool ParamPart::Slicer(String &LineS) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {
- // Clear();
+  // Clear();
   int i = 0; // Split counter
   char DC = DelimiterChar;
 
   if ((LineS.indexOf(OpenLine) == -1) || (LineS.indexOf(DC) == -1) || (LineS.indexOf(CloseLine) == -1)) // Check if is syntax (example chars: <   ;   > )
   // FAIL //
   {
-    SyntaxTest = false;
+    m_SyntaxTest = false;
     Clear();
     return false;
   }
@@ -101,7 +106,7 @@ bool ParamPart::Slicer(String& LineS) // Main function to split line to command 
     LineS.remove(0, NextDel + 1);          // Delete from the begin to first delimiter + 1
     NextDel = LineS.indexOf(DC);           // Find next delimiter
 
-    while ((NextDel != -1) && (i <= Max)) // Find and assign all parameters
+    while ((NextDel != -1) && (i < m_Max)) // Find and assign all parameters
     {
       Params[i] = LineS.substring(0, NextDel);
       LineS.remove(0, NextDel + 1);
@@ -109,28 +114,30 @@ bool ParamPart::Slicer(String& LineS) // Main function to split line to command 
       i++; // increment split counter
     };
 
-    ParamReadCount = i; // Dump split counter to variable
+    m_ParamReadCount = i; // Dump split counter to variable
     EmptyCut();
-    SyntaxTest = true;
+    m_SyntaxTest = true;
     return true;
   }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void ParamPart::CheckParamTypes()
 {
-  for (int i = 0; i < Max; i++) // Clear types
+  for (int i = 0; i < m_Max; i++) // Clear types
   {
     RType[i] = 0; // Set types default to NUMBER
   };
 
-  for (int i = 0; i < Max; i++)
+  for (int i = 0; i < m_Max; i++)
   {
 
     for (int z = 0; (Params[i][z] != 0); z++)
     {
 
       // Checking char by char what type is there. Just one char changes type to String (it is not integer)
-      if ((isDigit(Params[i][z])) || (Params[i][0]=='-') || ((Params[i][z]=='.') && (Params[i][0]!='.')))
+      if ((isDigit(Params[i][z])) || (Params[i][0] == '-') || ((Params[i][z] == '.') && (Params[i][0] != '.')))
       {
         RType[i] = (RType[i] == 1) ? 1 : 0; // 1 - STRING, 0 - NUMBER
       }
@@ -138,28 +145,24 @@ void ParamPart::CheckParamTypes()
       {
         RType[i] = 1;
       };
-
-
     };
-
-
   };
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
 {
 
-   if (!CheckIntegrity)
+  if (!CheckIntegrity)
     return true; // If function is disabled just pass integrity test.
-  
 
-  if (InputExpectedParams != ParamReadCount)
+  if (InputExpectedParams != m_ParamReadCount)
   {
     if (DebugEnabled)
       DebugIntegrityDump = "MEP"; // Missing/Extra expected parameters
     return false;                 // Fail integrity test.
   };
- 
 
   CheckParamTypes();
 
@@ -230,33 +233,30 @@ bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, b
   return true; // Parameters match -> Pass integrity test
 };
 
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
 {
-    String tmpReturn="";
-    if (SyntaxVerify())
-    {                                  //   (SYNTAX OK)
-        (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
-         if (!(Export_func==nullptr)) UnSetExportFunction();
-        if ((DebugEnabled) && (DebugIntegrityDump != ""))
-            tmpReturn=DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
-        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
-            tmpReturn="UC! (" + Command + ")"; // Unknown command print
-        Clear();                                          // Clear parampart to prepare for the next input.
-    }
-    else
-    { // (SYNTAX ERROR)
+  String tmpReturn = "";
+  if (SyntaxVerify())
+  {                                 //   (SYNTAX OK)
+    (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
+    if (!(Export_func == nullptr))
+      UnSetExportFunction();
+    if ((DebugEnabled) && (DebugIntegrityDump != ""))
+      tmpReturn = DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
+    if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+      tmpReturn = "UC! (" + Command + ")"; // Unknown command print
+    Clear();                               // Clear parampart to prepare for the next input.
+  }
+  else
+  { // (SYNTAX ERROR)
 
-        if ((DebugEnabled))
-            tmpReturn="SE!"; // Syntax Error - missing < or ; or >
-    };
-    return tmpReturn;
+    if ((DebugEnabled))
+      tmpReturn = "SE!"; // Syntax Error - missing < or ; or >
+  };
+  return tmpReturn;
 };
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -269,7 +269,7 @@ String ParamPart::Glue() // You can modify some parameter and stick full command
   Glue_hand = OpenLine + Command; // Dump command
   Glue_hand += DelimiterChar;
 
-  for (int i; i < Max; i++) // Dump parameters
+  for (int i; i < m_Max; i++) // Dump parameters
   {
     tmpstr = Params[i];
     if (Params[i][0] != 0)
@@ -283,31 +283,46 @@ String ParamPart::Glue() // You can modify some parameter and stick full command
   return Glue_hand;       // Returns remastered line
 };
 
-String ParamPart::ReadDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
-{
-    SetReadFlag(true);
-     if (RtnMsg)
-        return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
-};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+String ParamPart::toJSON()
+{
+  String tmpJSON = "{\"name\": \"pp_exp\",\"cnt\": \"" + static_cast<String>(m_ParamReadCount) + "\",\"params\":[";
+  for (int i=0; ((i<m_ParamReadCount) && (i<m_Max)); i++)
+  {
+    tmpJSON += "{\"text\":\"" + Params[i] + "\"}";
+    if (i!=(m_ParamReadCount-1)) tmpJSON+=',';
+  };
+  tmpJSON += "]}";
+  return tmpJSON;
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
- void ParamPart::operator<<(const char Line[]) // Overload << const char[]
- {
-  tmpnewLine=Line;
-  Slicer(tmpnewLine);
-}
-
- void ParamPart::operator<<(char Line[]) // Overload << char[]
- {
-  tmpnewLine=Line;
-  Slicer(tmpnewLine);
-}
-
-void ParamPart::operator<<(String& Line) // Overload << String
+String ParamPart::ReadDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
 {
-  tmpnewLine=Line;
+  SetReadFlag(true);
+  if (RtnMsg)
+    return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ParamPart::operator<<(const char Line[]) // Overload << const char[]
+{
+  tmpnewLine = Line;
+  Slicer(tmpnewLine);
+}
+
+void ParamPart::operator<<(char Line[]) // Overload << char[]
+{
+  tmpnewLine = Line;
+  Slicer(tmpnewLine);
+}
+
+void ParamPart::operator<<(String &Line) // Overload << String
+{
+  tmpnewLine = Line;
   Slicer(tmpnewLine);
 }
 
@@ -318,3 +333,26 @@ const String ParamPart::operator[](uint8_t n) // Overload [] - returns pointer t
 
   return Params[n];
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ParamPart::SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine)
+{
+  this->OpenLine = OpenLine;
+  this->DelimiterChar = DelimiterChar;
+  this->CloseLine = CloseLine;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ParamPart::SetExportFunction(void (*External_Export_func)(const String &))
+{
+  Export_func = External_Export_func;
+  CheckIntegrity = false;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ParamPart::UnSetExportFunction()
+{
+  Export_func = nullptr;
+  CheckIntegrity = true;
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////

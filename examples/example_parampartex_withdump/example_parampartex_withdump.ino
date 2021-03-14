@@ -4,8 +4,8 @@
 /* 
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
-2019 - 2020
-v. 3.4.2
+2019 - 2021
+v. 3.4.3
 
 Github: https://github.com/piotrku91/ParamPart/
 
@@ -59,6 +59,7 @@ void Reaction(ParamPart_Ex <> &P) // Access to ParamPart_Ex class by reference
         P.SetExportFunction(&FoundCmd); // Execute function which is listing implemented commands (Headers)
         P.ReadDone(false);
     };
+
 
 
     if ((P.Header("abc")) && P.Integrity(3,STRING, NUMBER, NUMBER))

@@ -6,8 +6,8 @@
 /* 
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
-2019 - 2020
-v. 3.4.2
+2019 - 2021
+v. 3.4.3
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -47,7 +47,7 @@ public:
                 UnSetExportFunction();
             if ((DebugEnabled) && (DebugIntegrityDump != ""))
                 pnt_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
-            if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+            if ((DebugEnabled) && (!Getm_ReadFlag() && (DebugIntegrityDump == "")))
                 pnt_Serial->println("UC! (" + Command + ")"); // Unknown command print
             Clear();                                          // Clear parampart to prepare for the next input.
         }

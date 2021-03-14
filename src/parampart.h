@@ -5,8 +5,8 @@
 /* 
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
-2019 - 2020
-v. 3.4.2
+2019 - 2021
+v. 3.4.3
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -31,14 +31,15 @@ public:
   String RawCopy;
 
 private:
-  const uint8_t Max;
-  uint8_t ParamReadCount;
-  bool SyntaxTest;
-  bool ReadFlag;
+  const uint8_t m_Max;
+  uint8_t m_ParamReadCount;
+  bool m_SyntaxTest;
+  bool m_ReadFlag;
 
 protected:
   String Params[MAX_PARAMS];
   String tmpnewLine; // Workflow variable
+
   bool CheckIntegrity;
   bool DebugEnabled;
   bool RType[MAX_PARAMS];
@@ -56,35 +57,24 @@ public:
   const String GetFullCommand() { return OpenLine + Command + DelimiterChar; };
   const String GetCloseLine() { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
   String ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
+  String toJSON();
   bool Slicer(String &LineS);
   bool CSlicer(char Line[]);
   String Glue();
 
   //Settings functions
-  void SetReadFlag(bool NewFlag) { ReadFlag = NewFlag; };
+  void SetReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
   void SetDebugMode(bool DebugStatus) { DebugEnabled = DebugStatus; };
   void SetIntegrityCheck(bool IntegrityStatus) { CheckIntegrity = IntegrityStatus; };
-  void SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine)
-  {
-    this->OpenLine = OpenLine;
-    this->DelimiterChar = DelimiterChar;
-    this->CloseLine = CloseLine;
-  };
-  void SetExportFunction(void (*External_Export_func)(const String &))
-  {
-    Export_func = External_Export_func;
-    CheckIntegrity = false;
-  };
-  void UnSetExportFunction()
-  {
-    Export_func = nullptr;
-    CheckIntegrity = true;
-  };
+  void SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine);
+  void SetExportFunction(void (*External_Export_func)(const String &));
+  void UnSetExportFunction();
 
-  bool GetReadFlag() const { return ReadFlag; };
+  const uint8_t size() { return m_ParamReadCount; };
+  bool GetReadFlag() const { return m_ReadFlag; };
   const String GetParam(uint8_t n) const { return Params[n]; };
   bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0);
-  bool SyntaxVerify() { return SyntaxTest; };
+  bool SyntaxVerify() { return m_SyntaxTest; };
 
   String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
 
@@ -102,7 +92,7 @@ public:
 
   // First and last element for range-based loops
   String *begin() { return &Params[0]; }
-  String *end() { return &Params[ParamReadCount]; }
+  String *end() { return &Params[m_ParamReadCount]; }
 
   // Constructors
 
@@ -111,8 +101,8 @@ public:
 
   // Constructor with overloaded syntax.
   ParamPart(char OL, char DL, char CL)
-      : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-        DebugEnabled(DEBUG_DEFAULT_STATUS), ParamReadCount(0), SyntaxTest(false), ReadFlag(false), Export_func(nullptr)
+      : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), m_Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+        DebugEnabled(DEBUG_DEFAULT_STATUS), m_ParamReadCount(0), m_SyntaxTest(false), m_ReadFlag(false), Export_func(nullptr)
   {
     Clear();
   };
@@ -130,7 +120,7 @@ public:
 
   void ArgAccess(const int &Amount, uint8_t &Counter, bool &tmpITest, uint8_t TypeExp)
   {
-    if ((Counter <= Amount - 1) && (Counter <= Max))
+    if ((Counter <= Amount - 1) && (Counter <= m_Max))
     {
       if (DebugEnabled)
       {
@@ -157,7 +147,7 @@ public:
     {
       return true;
     }; // If function is disabled just pass integrity test.
-    if (InputExpectedParams != ParamReadCount)
+    if (InputExpectedParams != m_ParamReadCount)
     {
       if (DebugEnabled)
       {
@@ -180,7 +170,7 @@ public:
     if (DebugEnabled)
     {
       DebugIntegrityDump += " / R: ";
-      for (int i = 0; i < Max; i++)
+      for (int i = 0; i < m_Max; i++)
       {
         DebugIntegrityDump += RType[i];
       };
@@ -192,6 +182,16 @@ public:
 
     DebugIntegrityDump = ""; // if pass integrity test just clean debug (delete default MM!)
     return true;             // Parameters match -> Pass integrity test
+  };
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //                                  Template for overload () operator Function
+
+  template <typename... TPack>
+  bool operator()(const String &CMD, const bool &Active, TPack &&... args)
+  {
+    return ((Header(CMD, Active)) && EIntegrity(args...));
   };
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

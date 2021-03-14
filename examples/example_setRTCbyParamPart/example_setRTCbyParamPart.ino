@@ -26,71 +26,80 @@ Wire - Library supports i2c
 //
 
 DS3231Plus Clock;
-ParamPart_Ex <> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
+ParamPart_Ex<> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
 
 void DoSomething()
 {
-Serial.println("Snoring... Zzz....");  
+  Serial.println("Snoring... Zzz....");
 };
 
 void setup()
 {
-    Serial.begin(9600);
-    pinMode(LED_BUILTIN, OUTPUT);
-    Wire.begin();
+  Serial.begin(9600);
+  pinMode(LED_BUILTIN, OUTPUT);
+  Wire.begin();
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reaction(ParamPart_Ex <> &P) // Access to ParamPart_Ex class by reference
+void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex class by reference
 {
+  ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    if (P.Header("delay")) // Delay
-    {
-        Clock.DelayRTCLock(5500,&DoSomething);
-        P.ReadDone();
-    };
+  if (P.Header("js")) // Example of export ParamPart parameters to JSON format
+  {
+    P.pnt_Serial->println(P.toJSON());
+    P.ReadDone();
+  };
+  ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    if ((P.Header("tset")) && P.EIntegrity(NUMBER,NUMBER,NUMBER,NUMBER,NUMBER,NUMBER,NUMBER)) // Set time example
-    {
-      // YY;MM;DD;DW;HH;MM;SS;
-      Clock.SetFullTime(P[0].toInt(),P[1].toInt(),P[2].toInt(),P[3].toInt(),P[4].toInt(),P[5].toInt(),P[7].toInt());
-          
-        P.ReadDone(true);
-    };
+  if (P.Header("delay")) // Delay
+  {
+    Clock.DelayRTCLock(5500, &DoSomething);
+    P.ReadDone();
+  };
+  ////////////////////////////////////////////////////////////////////////////////////////////////
 
-       if (P.Header("aset_test")) // Set alarm test (One minute from now)
-    {
-      
-      Clock.setA1Time(Clock.getDoW(), Clock.getHour(Clock.h12,Clock.PM), Clock.getMinute()+1, Clock.getSecond(), 0x0, true, false, false);
-      Clock.turnOnAlarm(1);
- 
-      P.ReadDone(true);
-    };
+  if ((P.Header("tset")) && P.EIntegrity(NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER, NUMBER)) // Set time example
+  {
+    // YY;MM;DD;DW;HH;MM;SS;
+    Clock.SetFullTime(P[0].toInt(), P[1].toInt(), P[2].toInt(), P[3].toInt(), P[4].toInt(), P[5].toInt(), P[7].toInt());
 
+    P.ReadDone(true);
+  };
 
-         if ((P.Header("tset")) && P.EIntegrity(NUMBER,NUMBER,NUMBER,NUMBER))  // Set alarm test 
-    {
-      
-      Clock.setA1Time(P[3].toInt(), P[4].toInt(), P[5].toInt(), P[7].toInt(), 0x0, true, false, false);
-      Clock.turnOnAlarm(1);
-      P.ReadDone(true);
+  ////////////////////////////////////////////////////////////////////////////////////////////////
 
+  if (P.Header("aset_test")) // Set alarm test (One minute from now)
+  {
 
-      
-    };
+    Clock.setA1Time(Clock.getDoW(), Clock.getHour(Clock.h12, Clock.PM), Clock.getMinute() + 1, Clock.getSecond(), 0x0, true, false, false);
+    Clock.turnOnAlarm(1);
+
+    P.ReadDone(true);
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if ((P.Header("tset")) && P.EIntegrity(NUMBER, NUMBER, NUMBER, NUMBER)) // Set alarm test
+  {
+
+    Clock.setA1Time(P[3].toInt(), P[4].toInt(), P[5].toInt(), P[7].toInt(), 0x0, true, false, false);
+    Clock.turnOnAlarm(1);
+    P.ReadDone(true);
+  };
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 void loop()
 {
 
-  if (Clock.checkIfAlarm(1)) { Serial.println("BOOOOOM ! :) Alarm executed! ");};
-   
-Serial.println(Clock.GetTimeString(true,false,true));
-    delay(1000);
-    Odczyt.HybridInterpreter(&Reaction);
-    
+  if (Clock.checkIfAlarm(1))
+  {
+    Serial.println("BOOOOOM ! :) Alarm executed! ");
+  };
+
+  Serial.println(Clock.GetTimeString(true, false, true));
+  delay(1000);
+  Odczyt.HybridInterpreter(&Reaction);
 }

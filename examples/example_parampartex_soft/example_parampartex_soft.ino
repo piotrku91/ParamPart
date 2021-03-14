@@ -5,8 +5,8 @@
 /* 
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
-2019 - 2020
-v. 3.4.2
+2019 - 2021
+v. 3.4.3
 
 Github: https://github.com/piotrku91/ParamPart/
 
@@ -59,6 +59,13 @@ void Reaction(ParamPart_Ex <SoftwareSerial> &P) // Access to ParamPart_Ex object
     if (P.Header("test2"), false) // Simple example of respond (If second argument is false, this block of reaction is deactivated)
     {
         P.pnt_Serial->println("Hi!");
+        P.ReadDone();
+    };
+     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        if (P.Header("js")) // Example of export ParamPart parameters to JSON format
+    {
+        P.pnt_Serial->println(P.toJSON());
         P.ReadDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////

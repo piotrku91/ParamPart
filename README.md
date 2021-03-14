@@ -6,8 +6,8 @@ Written by Piotr Kupczyk (dajmosster@gmail.com)
 Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
 
-2019 - 2020
-v. 3.4.2
+2019 - 2021
+v. 3.4.3
 
 **It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 
@@ -159,6 +159,8 @@ and get some return <artn;abc;OK;>
 **  template<typename... TPack> bool EIntegrity(TPack&&... args) ** - Check types of input and expected parameters. Return false if is any mismatch. Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS in parampart header file). Don't need specify of amount expected parameters. 
 
 **String Glue()** - Create String line from actual object variables (inversion).
+
+**String toJSON()** - Returns parameters stored in ParamPart in JSON format.
 
 **Clear()** - Clean object and prepare to next String line.
 

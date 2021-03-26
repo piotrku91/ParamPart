@@ -4,7 +4,7 @@
 Arduino Serial String Data Splitter  - ParamPart_Ex (Extended Version with Serial Receiver)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2021
-v. 3.4.3
+v. 3.5
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename SerialType>
@@ -30,7 +30,7 @@ void ParamPart_Ex<SerialType>::ReadDone(bool RtnMsg, String ParamRtn, String Rtn
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// DEFAULT INTERPRETER FUNCTION
 template <typename SerialType>
 void ParamPart_Ex<SerialType>::Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP)) // Start interpret object
 {
@@ -53,6 +53,9 @@ void ParamPart_Ex<SerialType>::Interpreter(void (*ptn_func_interpreter)(ParamPar
             pnt_Serial->println("SE!"); // Syntax Error - missing < or ; or >
     };
 };
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename SerialType>
 void ParamPart_Ex<SerialType>::HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType>  &PP)) // Receive Serial line and Start interpret object.

@@ -6,7 +6,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2021
-v. 3.4.3
+v. 3.5
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -15,13 +15,11 @@ Github: https://github.com/piotrku91/ParamPart/
 //                                                                        CLASS ParamPart  - Header file                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAX_PARAMS 9
+//#define MAX_PARAMS 9
 #define CHECK_INTEGRITY_DEFAULT_STATUS true
 #define DEBUG_DEFAULT_STATUS true
 
-// Define some helpful const (example to use in program: P.Integrity(2,NUMBER,STRING))
-#define STRING 1
-#define NUMBER 0
+enum class PT {Num=0,Txt=1,Any=2}; // Types to use with integrity checks. Use like PT::Num, PT::Txt, PT::Any as arguments in Integrity function.
 
 class ParamPart // Arduino String Serial Data Splitter
 {
@@ -30,19 +28,20 @@ public:
   String DebugIntegrityDump;
   String RawCopy;
 
-private:
+protected:
   const uint8_t m_Max;
   uint8_t m_ParamReadCount;
   bool m_SyntaxTest;
   bool m_ReadFlag;
 
-protected:
-  String Params[MAX_PARAMS];
+  String* Params; // Params String Table (dynamic array)
+  PT* RType; // Params Type Table (dynamic array)
+
   String tmpnewLine; // Workflow variable
 
   bool CheckIntegrity;
   bool DebugEnabled;
-  bool RType[MAX_PARAMS];
+
   char DelimiterChar;
   char OpenLine;
   char CloseLine;
@@ -50,19 +49,17 @@ protected:
   void (*Export_func)(const String &);
 
   // Public functions
-public:
+public: 
   void Clear();
   bool Header(const String &CmdName, bool Active = true);
-  const String GetCommand() { return Command; };
-  const String GetFullCommand() { return OpenLine + Command + DelimiterChar; };
-  const String GetCloseLine() { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
+  bool SyntaxVerify() { return m_SyntaxTest; };
+  String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
   String ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
-  String toJSON();
   bool Slicer(String &LineS);
   bool CSlicer(char Line[]);
-  String Glue();
+ 
 
-  //Settings functions
+  // **Set functions
   void SetReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
   void SetDebugMode(bool DebugStatus) { DebugEnabled = DebugStatus; };
   void SetIntegrityCheck(bool IntegrityStatus) { CheckIntegrity = IntegrityStatus; };
@@ -70,16 +67,19 @@ public:
   void SetExportFunction(void (*External_Export_func)(const String &));
   void UnSetExportFunction();
 
-  const uint8_t size() { return m_ParamReadCount; };
+ // **Get functions
+  const int size() { return m_ParamReadCount; };
   bool GetReadFlag() const { return m_ReadFlag; };
   const String GetParam(uint8_t n) const { return Params[n]; };
-  bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0);
-  bool SyntaxVerify() { return m_SyntaxTest; };
+  const String GetCommand() { return Command; };
+  const String GetFullCommand() { return OpenLine + Command + DelimiterChar; };
+  const String GetCloseLine() { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
+  const String toJSON();
+  const String Glue();
 
-  String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
 
-  // Private functions
-private:
+  // Protectedfunctions
+protected:
   void CheckParamTypes();
   void EmptyCut();
 
@@ -97,15 +97,25 @@ public:
   // Constructors
 
   // Constructor for default syntax
-  ParamPart() : ParamPart('<', ';', '>'){}; // Delegated to Constructor with overloaded syntax.
+  ParamPart(ParamPart&) = delete;
+  ParamPart() : ParamPart(9,'<', ';', '>'){}; // Delegated to Constructor with overloaded syntax.
+  ParamPart(const int& size) : ParamPart(size,'<', ';', '>'){}; // Delegated to Constructor with overloaded syntax.
 
   // Constructor with overloaded syntax.
-  ParamPart(char OL, char DL, char CL)
-      : OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), m_Max(MAX_PARAMS), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+  ParamPart(const int& size, char OL, char DL, char CL)
+      : m_Max(size), Params(new String[m_Max]), RType(new PT[m_Max]), OpenLine(OL),  DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
         DebugEnabled(DEBUG_DEFAULT_STATUS), m_ParamReadCount(0), m_SyntaxTest(false), m_ReadFlag(false), Export_func(nullptr)
   {
     Clear();
   };
+
+  // Destructor
+
+  ~ParamPart() {
+    // Free tables
+     delete[] Params; 
+     delete[] RType;
+     }
 
   ///////////////////////////////////////////////////// TEMPLATES - FUNCTIONS /////////////////////////////////////////////////////////////////
 
@@ -118,15 +128,15 @@ public:
     PassF_TPack(T...) {}
   };
 
-  void ArgAccess(const int &Amount, uint8_t &Counter, bool &tmpITest, uint8_t TypeExp)
+  void ArgAccess(const int &Amount, uint8_t &Counter, bool &tmpITest, PT TypeExp)
   {
     if ((Counter <= Amount - 1) && (Counter <= m_Max))
     {
       if (DebugEnabled)
       {
-        DebugIntegrityDump += static_cast<String>(TypeExp);
+        DebugIntegrityDump += static_cast<String>(static_cast<int>(TypeExp));
       };
-      if (TypeExp == RType[Counter] && (tmpITest))
+      if ((TypeExp == RType[Counter] || (TypeExp==PT::Any)) && (tmpITest))
       {
         tmpITest = true;
       }
@@ -139,7 +149,7 @@ public:
   };
 
   template <typename... TPack>
-  bool EIntegrity(TPack &&... args) // Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS). Don't need specify of amount expected parameters.
+  bool Integrity(TPack &&... args) // Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS). Don't need specify of amount expected parameters.
   {
 
     uint8_t InputExpectedParams = (sizeof...(TPack));
@@ -172,7 +182,7 @@ public:
       DebugIntegrityDump += " / R: ";
       for (int i = 0; i < m_Max; i++)
       {
-        DebugIntegrityDump += RType[i];
+        DebugIntegrityDump += static_cast<String>(static_cast<int>(RType[i]));
       };
       DebugIntegrityDump += " MM!"; // mismatch parameters default set
     };

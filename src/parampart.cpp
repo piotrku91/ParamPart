@@ -4,7 +4,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2020
-v. 3.4.2
+v. 3.5
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -125,115 +125,31 @@ bool ParamPart::Slicer(String &LineS) // Main function to split line to command 
 
 void ParamPart::CheckParamTypes()
 {
-  for (int i = 0; i < m_Max; i++) // Clear types
+    for (int i = 0; i < m_ParamReadCount; i++) // Clear types
   {
-    RType[i] = 0; // Set types default to NUMBER
+    RType[i] = PT::Any; // Set types default to NUMBER
   };
 
-  for (int i = 0; i < m_Max; i++)
+  for (int i = 0; i < m_ParamReadCount; i++)
   {
 
-    for (int z = 0; (Params[i][z] != 0); z++)
-    {
-
-      // Checking char by char what type is there. Just one char changes type to String (it is not integer)
-      if ((isDigit(Params[i][z])) || (Params[i][0] == '-') || ((Params[i][z] == '.') && (Params[i][0] != '.')))
-      {
-        RType[i] = (RType[i] == 1) ? 1 : 0; // 1 - STRING, 0 - NUMBER
-      }
-      else
-      {
-        RType[i] = 1;
-      };
-    };
+  if (Params[i] == "0") // If String is 0 then Param eqals to integer with value 0 (don't need any casting)
+  {
+    RType[i]  = PT::Num; // Set type as integer
+  }
+  else
+  {
+   
+    int TmpType = Params[i].toInt(); // Cast to integer
+    if (TmpType==0) // If is 0 then casting failed so type is string
+      RType[i]  = PT::Txt; // Set type as String
+    else
+      RType[i]  = PT::Num; // Set type
   };
+  };
+
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool ParamPart::Integrity(uint8_t InputExpectedParams, bool Type1, bool Type2, bool Type3, bool Type4, bool Type5, bool Type6, bool Type7, bool Type8, bool Type9)
-{
-
-  if (!CheckIntegrity)
-    return true; // If function is disabled just pass integrity test.
-
-  if (InputExpectedParams != m_ParamReadCount)
-  {
-    if (DebugEnabled)
-      DebugIntegrityDump = "MEP"; // Missing/Extra expected parameters
-    return false;                 // Fail integrity test.
-  };
-
-  CheckParamTypes();
-
-  if (DebugEnabled)
-  {
-    // Expected parameters debug
-    DebugIntegrityDump = "E: " + (String)Type1 + (String)Type2 + (String)Type3 + (String)Type4 + (String)Type5 + (String)Type6 + (String)Type7 + (String)Type8 + (String)Type9;
-    DebugIntegrityDump += " / R: ";
-
-    // Received parameters debug
-    for (int i = 0; i < 9; i++)
-    {
-      DebugIntegrityDump += RType[i];
-    };
-    DebugIntegrityDump += " MM!"; // mismatch parameters
-  };
-
-  // If some expected parameter dismatch -> fail integrity test.
-  if (InputExpectedParams >= 1)
-  {
-    if (Type1 != RType[0])
-
-      return false;
-  }
-  if (InputExpectedParams >= 2)
-  {
-    if (Type2 != RType[1])
-      return false;
-  }
-  if (InputExpectedParams >= 3)
-  {
-    if (Type3 != RType[2])
-      return false;
-  }
-  if (InputExpectedParams >= 4)
-  {
-    if (Type4 != RType[3])
-      return false;
-  }
-  if (InputExpectedParams >= 5)
-  {
-    if (Type5 != RType[4])
-      return false;
-  }
-  if (InputExpectedParams >= 6)
-  {
-    if (Type6 != RType[5])
-      return false;
-  }
-  if (InputExpectedParams >= 7)
-  {
-    if (Type7 != RType[6])
-      return false;
-  }
-  if (InputExpectedParams >= 8)
-  {
-    if (Type8 != RType[7])
-      return false;
-  }
-  if (InputExpectedParams >= 9)
-  {
-    if (Type9 != RType[8])
-      return false;
-  }
-
-  DebugIntegrityDump = ""; // if pass integrity test just clean debug
-
-  return true; // Parameters match -> Pass integrity test
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
 {
@@ -260,7 +176,7 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::Glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
+const String ParamPart::Glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
 {
   //   Clear();
   String Glue_hand;
@@ -285,13 +201,14 @@ String ParamPart::Glue() // You can modify some parameter and stick full command
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::toJSON()
+const String ParamPart::toJSON()
 {
   String tmpJSON = "{\"name\": \"pp_exp\",\"cnt\": \"" + static_cast<String>(m_ParamReadCount) + "\",\"params\":[";
-  for (int i=0; ((i<m_ParamReadCount) && (i<m_Max)); i++)
+  for (int i = 0; ((i < m_ParamReadCount) && (i < m_Max)); i++)
   {
     tmpJSON += "{\"text\":\"" + Params[i] + "\"}";
-    if (i!=(m_ParamReadCount-1)) tmpJSON+=',';
+    if (i != (m_ParamReadCount - 1))
+      tmpJSON += ',';
   };
   tmpJSON += "]}";
   return tmpJSON;

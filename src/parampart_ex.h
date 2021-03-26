@@ -7,7 +7,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2021
-v. 3.4.3
+v. 3.5
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -32,10 +32,25 @@ public:
 
     // Constructors for extended class
     ParamPart_Ex(ParamPart_Ex<SerialType>&) = delete; // disable copy constructor
-    ParamPart_Ex(ParamPart_Ex<SerialType>&&) = delete; // disable move constuctor
     ParamPart_Ex() = delete; // disable default constructor
-    ParamPart_Ex(SerialType *WS, char OL = '<', char DL = ';', char CL = '>') : ParamPart(OL, DL, CL), pnt_Serial(WS){};
 
+    ParamPart_Ex(SerialType *WS, char OL = '<', char DL = ';', char CL = '>') : ParamPart(9,OL, DL, CL), pnt_Serial(WS){};
+     ParamPart_Ex(SerialType *WS, int size) : ParamPart(size), pnt_Serial(WS){};
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /*                                      Special template for Reaction Function from class member
+
+  CALL EXAMPLE:
+  For example - Reaction function is a member of MainSetter class (MainSetter::Reaction).
+
+  typedef void (MainSetter::*ReactPTR)(ParamPart &PP);
+  ReactPTR MemberReactionPointer= &MainSetter::Reaction;
+  OdczytParted.Interpreter(this,MemberReactionPointer);
+
+
+*/
     template <typename T>
     void Interpreter(T *M, void (T::*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP))
     {
@@ -58,6 +73,8 @@ public:
                 pnt_Serial->println("SE!"); // Syntax Error - missing < or ; or >
         };
     };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 };
 
 #endif

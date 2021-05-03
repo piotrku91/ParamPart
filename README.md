@@ -158,6 +158,8 @@ and get some return <artn;abc;OK;>
 
 **String Glue()** - Create String line from actual object variables (inversion).
 
+**String toJSON()** - Returns parameters stored in ParamPart in JSON format.
+
 **Clear()** - Clean object and prepare to next String line.
 
 

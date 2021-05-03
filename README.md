@@ -6,8 +6,8 @@ Written by Piotr Kupczyk (dajmosster@gmail.com)
 Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
 
-2019 - 2020
-v. 3.4.3
+2019 - 2021
+v. 3.5
 
 **It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 

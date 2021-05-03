@@ -94,8 +94,9 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex object by reference (
         P.ReadDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if ((P.Header("db")) && P.Integrity(PT::Num)) // Change debug mode
-    {
+      if (P("db", true, PT::Num)) // Change debug mode 
+    // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
+     {
 
         P.SetDebugMode(P[0].toInt());
         P.ReadDone();

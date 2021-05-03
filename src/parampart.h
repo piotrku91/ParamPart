@@ -218,7 +218,7 @@ public:
   template <typename... TPack>
   bool operator()(const String &CMD, const bool &Active, TPack &&... args)
   {
-    return ((Header(CMD, Active)) && EIntegrity(args...));
+    return ((Header(CMD, Active)) && Integrity(args...));
   };
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -64,6 +64,14 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
         P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
                     // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+       if (P("db", true, PT::Num)) // Change debug mode 
+    // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
+     {
+
+        P.SetDebugMode(P[0].toInt());
+        P.ReadDone();
+    };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if ((P.Header("dw")) && P.Integrity(PT::Num))  //Simple digitalWrite example

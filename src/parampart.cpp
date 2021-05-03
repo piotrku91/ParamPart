@@ -245,7 +245,7 @@ void ParamPart::operator<<(String &Line) // Overload << String
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const String ParamPart::operator[](uint8_t n) // Overload [] - returns pointer to choosed param
+String& ParamPart::operator[](uint8_t n) // Overload [] - returns reference to choosed param
 {
 
   return Params[n];

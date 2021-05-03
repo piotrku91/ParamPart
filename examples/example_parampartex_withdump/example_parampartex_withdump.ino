@@ -5,7 +5,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2021
-v. 3.4.3
+v. 3.5
 
 Github: https://github.com/piotrku91/ParamPart/
 
@@ -62,7 +62,7 @@ void Reaction(ParamPart_Ex <> &P) // Access to ParamPart_Ex class by reference
 
 
 
-    if ((P.Header("abc")) && P.Integrity(3,STRING, NUMBER, NUMBER))
+    if ((P.Header("abc")) && P.Integrity(3,PT::Txt,PT::Num,PT::Num)
     {
         P.pnt_Serial->print("Hi ");
         P.pnt_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
@@ -76,7 +76,7 @@ void Reaction(ParamPart_Ex <> &P) // Access to ParamPart_Ex class by reference
                       // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
 
-    if ((P.Header("dw")) && P.Integrity(1,NUMBER)) // Simple digitalWrite example
+    if ((P.Header("dw")) && P.Integrity(PT::Num)) // Simple digitalWrite example
     {
         // If pass integrity checks, i'm not scared to conversion P[0] to int.
         digitalWrite(LED_BUILTIN, (P[0].toInt()));

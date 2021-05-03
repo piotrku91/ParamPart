@@ -5,7 +5,7 @@
   Arduino Serial Serial Data Splitter - ParamPart Basic Example
   Written by Piotr Kupczyk (dajmosster@gmail.com) 
   2019 - 2021
-  v. 3.4.3
+  v. 3.5
 
  In this version you need to pass String to ParamPart Object manualy from Serial or Script file, whatever you want :) 
  
@@ -45,11 +45,11 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
 
         if (P.Header("js")) // Example of export ParamPart parameters to JSON format
     {
-        P.pnt_Serial->println(P.toJSON());
+        Serial.println(P.toJSON());
         P.ReadDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
-       if ((P.Header("abc")) && P.Integrity(3, STRING, NUMBER, NUMBER))
+       if ((P.Header("abc")) && P.Integrity(3, PT::Txt, PT::Num, PT::Num))
     {
         Serial.print("Hi ");
         Serial.print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
@@ -66,7 +66,7 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if ((P.Header("dw")) && P.Integrity(1,NUMBER))  //Simple digitalWrite example
+    if ((P.Header("dw")) && P.Integrity(PT::Num))  //Simple digitalWrite example
     {
         // If pass integrity checks, i'm not scared to conversion P[0] to int.
         digitalWrite(LED_BUILTIN, (P[0].toInt()));

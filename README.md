@@ -7,7 +7,7 @@ Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
 
 2019 - 2020
-v. 3.4.2
+v. 3.4.3
 
 **It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 
@@ -154,9 +154,7 @@ and get some return <artn;abc;OK;>
 
 **bool CSlicer(char Line[])** - Parse CString by designated syntax and store in ParamPart object. (Old version of function).
 
-**bool Integrity(uint8_t InputExpectedParams = 0, bool Type1 = 0, bool Type2 = 0, bool Type3 = 0, bool Type4 = 0, bool Type5 = 0, bool Type6 = 0, bool Type7 = 0, bool Type8 = 0, bool Type9 = 0)** - Check amount of parameters, data types inside and compare with expected types. 
-
-**  template<typename... TPack> bool EIntegrity(TPack&&... args) ** - Check types of input and expected parameters. Return false if is any mismatch. Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS in parampart header file). Don't need specify of amount expected parameters. 
+**  template<typename... TPack> bool Integrity(TPack&&... args) ** - Check types of input and expected parameters. Don't need specify of amount expected parameters. 
 
 **String Glue()** - Create String line from actual object variables (inversion).
 

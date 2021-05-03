@@ -20,6 +20,7 @@ Github: https://github.com/piotrku91/ParamPart/
 #define DEBUG_DEFAULT_STATUS true
 
 enum class PT {Num=0,Txt=1,Any=2}; // Types to use with integrity checks. Use like PT::Num, PT::Txt, PT::Any as arguments in Integrity function.
+const String DebugNames[3] = {{"[Num]"},{"[Txt]"},{"[Any]"}};
 
 class ParamPart // Arduino String Serial Data Splitter
 {
@@ -74,7 +75,7 @@ public:
   const String GetCommand() { return Command; };
   const String GetFullCommand() { return OpenLine + Command + DelimiterChar; };
   const String GetCloseLine() { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
-  const String toJSON();
+  const String toJSON(); // Export Params to JSON format.
   const String Glue();
 
 
@@ -88,7 +89,7 @@ public:
   void operator<<(const char Line[]);
   void operator<<(char Line[]);
   void operator<<(String &Line);
-  const String operator[](uint8_t n);
+  String& operator[](uint8_t n);
 
   // First and last element for range-based loops
   String *begin() { return &Params[0]; }
@@ -134,7 +135,15 @@ public:
     {
       if (DebugEnabled)
       {
-        DebugIntegrityDump += static_cast<String>(static_cast<int>(TypeExp));
+        if (TypeExp==PT::Txt) {
+        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
+        };
+        if (TypeExp==PT::Num) {
+        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
+        };
+        if (TypeExp==PT::Any) {
+        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
+        };
       };
       if ((TypeExp == RType[Counter] || (TypeExp==PT::Any)) && (tmpITest))
       {
@@ -180,9 +189,17 @@ public:
     if (DebugEnabled)
     {
       DebugIntegrityDump += " / R: ";
-      for (int i = 0; i < m_Max; i++)
+      for (int i = 0; i < m_ParamReadCount; i++)
       {
-        DebugIntegrityDump += static_cast<String>(static_cast<int>(RType[i]));
+             if (RType[i]==PT::Txt) {
+        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
+        };
+        if (RType[i]==PT::Num) {
+        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
+        };
+        if (RType[i]==PT::Any) {
+        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
+        };
       };
       DebugIntegrityDump += " MM!"; // mismatch parameters default set
     };

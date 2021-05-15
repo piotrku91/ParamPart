@@ -24,11 +24,23 @@ And you can do something by Reaction function:
 
 >
 
-       void Reaction(ParamPart& P) 
-       {
+       void Reaction(ParamPart &P)
+    {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-       if ((P.Header("abc")) && P.Integrity(3, STRING, NUMBER, NUMBER))
+    if (P.Header("test")) // Simple example of respond
+    {
+        Serial.println("Hi!");
+        P.ReadDone();
+    };
+  
+    if (P.Header("js")) // Example of export ParamPart parameters to JSON format
+    {
+        Serial.println(P.toJSON());
+        P.ReadDone();
+    };
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    if ((P.Header("abc")) && P.Integrity(PT::Txt, PT::Num, PT::Num))
     {
         Serial.print("Hi ");
         Serial.print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
@@ -37,13 +49,18 @@ And you can do something by Reaction function:
         Serial.print(" years old and ");
         Serial.print(P[2]);
         Serial.println(" cm.  ");
-        
-        P.ReadDone();
+
+        for (auto &pa : P)
+        {
+            Serial.println(pa);
+        }; // Print all parameters by range-based loop.
+
+        P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed              command)
+                      // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    if ((P.Header("db")) && P.Integrity(1, NUMBER)) // Change debug mode
+    if (P("db", true, PT::Num)) // Change debug mode
+                                // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
     {
 
         P.SetDebugMode(P[0].toInt());
@@ -51,23 +68,15 @@ And you can do something by Reaction function:
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    if ((P.Header("cmp")) && P.Integrity(2, NUMBER, NUMBER)) // Compare and send sum by return example
+    if ((P.Header("dw")) && P.Integrity(PT::Num)) //Simple digitalWrite example
     {
-        if (P[0] > P[1])
-            Serial.print("1st");
-        if (P[0] < P[1])
-            Serial.print("2nd");
-        if (P[0] == P[1])
-            Serial.println("same");
-        else
-            Serial.println(" is bigger");
-
-        int sum = (P[0].toInt() + P[1].toInt()); // Do some example maths and return as parameter.
-        P.ReadDone(true, static_cast<String>(sum));
+        // If pass integrity checks, i'm not scared to conversion P[0] to int.
+        digitalWrite(LED_BUILTIN, (P[0].toInt()));
+        P.ReadDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    };
+       };
+
 
 
 

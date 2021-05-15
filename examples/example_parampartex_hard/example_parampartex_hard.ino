@@ -64,13 +64,13 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex object by reference (
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-        if (P.Header("js")) // Example of export ParamPart parameters to JSON format
+    if (P.Header("js")) // Example of export ParamPart parameters to JSON format
     {
         P.pnt_Serial->println(P.toJSON());
         P.ReadDone();
     };
 
-     ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     if ((P.Header("abc")) && P.Integrity(PT::Txt, PT::Num, PT::Num))
     {
         P.pnt_Serial->print("Hi ");
@@ -81,7 +81,10 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex object by reference (
         P.pnt_Serial->print(P[2]);
         P.pnt_Serial->println(" cm.  ");
 
-         for (auto& pa : P) {  P.pnt_Serial->println(pa); }; // Print all parameters by range-based loop.
+        for (auto &pa : P)
+        {
+            P.pnt_Serial->println(pa);
+        }; // Print all parameters by range-based loop.
 
         P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
                       // Always use this function after finish your reaction block. It's setting ReadFlag.
@@ -94,15 +97,15 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex object by reference (
         P.ReadDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
-      if (P("db", true, PT::Num)) // Change debug mode 
-    // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
-     {
+    if (P("db", true, PT::Num)) // Change debug mode
+                                // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
+    {
 
         P.SetDebugMode(P[0].toInt());
         P.ReadDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if ((P.Header("cmp")) && P.Integrity(PT::Num,PT::Num)) // Compare and send sum by return example (Expanded version test)
+    if ((P.Header("cmp")) && P.Integrity(PT::Num, PT::Num)) // Compare and send sum by return example (Expanded version test)
     {
         if (P[0] > P[1])
             Serial.print("1st");
@@ -124,5 +127,4 @@ void loop()
 {
     delay(100);
     Odczyt.HybridInterpreter(&Reaction); // Read and react to data from Serial.
-                                         
 }

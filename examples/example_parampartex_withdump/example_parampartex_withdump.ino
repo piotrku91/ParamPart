@@ -1,4 +1,5 @@
 #include "parampart_ex.h"
+#include "parampart_ex.cpp"
 #include "HardwareSerial.h"
 
 /* 
@@ -24,71 +25,63 @@ You get respond: Hi Peter, you have 33 years old and 160 cm.
 
 //
 
-  
-  void FoundCmd(const String& Cmd) //Example of function which is listing implemented commands (Headers).
-  {
-    static int Count=1;
-    Serial.print(Count);
-    Serial.print(" - Found command: ");
-    Serial.println(Cmd);
-    
-    // Save to some file function etc....
-    
-    Count++;
-    
-  };
+void FoundCmd(const String &Cmd) //Example of function which is listing implemented commands (Headers).
+{
+  static int Count = 1;
+  Serial.print(Count);
+  Serial.print(" - Found command: ");
+  Serial.println(Cmd);
 
-  ParamPart_Ex <> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
+  // Save to some file function etc....
+
+  Count++;
+};
+
+ParamPart_Ex<> Odczyt(&Serial); // Create object ParamPart_Ex with pointer to Serial as parameter.
 
 void setup()
 {
-    Serial.begin(9600);
-    pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(9600);
+  pinMode(LED_BUILTIN, OUTPUT);
   //  P.SetExportFunction(&FoundCmd); // Export from the begin (Starts when you send first String to interpreter.)
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Reaction(ParamPart_Ex <> &P) // Access to ParamPart_Ex class by reference
+void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex class by reference
 {
 
-      if (P.Header("ex"))  // Export implemented commands (Headers). Should be first block in Reaction function to dump everything.
-    {
-        P.SetExportFunction(&FoundCmd); // Execute function which is listing implemented commands (Headers)
-        P.ReadDone(false);
-    };
+  if (P.Header("ex")) // Export implemented commands (Headers). Should be first block in Reaction function to dump everything.
+  {
+    P.SetExportFunction(&FoundCmd); // Execute function which is listing implemented commands (Headers)
+    P.ReadDone(false);
+  };
 
+  if ((P.Header("abc")) && (P.Integrity(PT::Txt, PT::Num, PT::Num)))
+  {
+    P.pnt_Serial->print("Hi ");
+    P.pnt_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
+    P.pnt_Serial->print(", you have ");
+    P.pnt_Serial->print(P[1]);
+    P.pnt_Serial->print(" years old and ");
+    P.pnt_Serial->print(P[2]);
+    P.pnt_Serial->println(" cm.  ");
 
+    P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
+                  // Always use this function after finish your reaction block. It's setting ReadFlag.
+  };
 
-    if ((P.Header("abc")) && P.Integrity(3,PT::Txt,PT::Num,PT::Num)
-    {
-        P.pnt_Serial->print("Hi ");
-        P.pnt_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
-        P.pnt_Serial->print(", you have ");
-        P.pnt_Serial->print(P[1]);
-        P.pnt_Serial->print(" years old and ");
-        P.pnt_Serial->print(P[2]);
-        P.pnt_Serial->println(" cm.  ");
-
-        P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
-                      // Always use this function after finish your reaction block. It's setting ReadFlag.
-    };
-
-    if ((P.Header("dw")) && P.Integrity(PT::Num)) // Simple digitalWrite example
-    {
-        // If pass integrity checks, i'm not scared to conversion P[0] to int.
-        digitalWrite(LED_BUILTIN, (P[0].toInt()));
-        P.ReadDone();
-    };
-
-
+  if ((P.Header("dw")) && (P.Integrity(PT::Num))) // Simple digitalWrite example
+  {
+    // If pass integrity checks, i'm not scared to conversion P[0] to int.
+    digitalWrite(LED_BUILTIN, (P[0].toInt()));
+    P.ReadDone();
+  };
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void loop()
 {
-    delay(100);
-    Odczyt.HybridInterpreter(&Reaction);
+  delay(100);
+  Odczyt.HybridInterpreter(&Reaction);
 }

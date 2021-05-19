@@ -1,10 +1,11 @@
+#pragma once
 #include "parampart_ex.h"
 
 /* 
 Arduino Serial String Data Splitter  - ParamPart_Ex (Extended Version with Serial Receiver)
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2021
-v. 3.5
+v. 3.6
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename SerialType>
@@ -22,11 +23,11 @@ String ParamPart_Ex<SerialType>::RawRead() //Returns line from Serial or nothing
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename SerialType>
-void ParamPart_Ex<SerialType>::ReadDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
+void ParamPart_Ex<SerialType>::readDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
 {
     if (RtnMsg)
         pnt_Serial->println(OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
-    SetReadFlag(true);
+    setReadFlag(true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,14 +36,14 @@ template <typename SerialType>
 void ParamPart_Ex<SerialType>::Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP)) // Start interpret object
 {
 
-    if (SyntaxVerify())
+    if (syntaxVerify())
     {                                   //   (SYNTAX OK)
         (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
         if (!(Export_func == nullptr))
-            UnSetExportFunction();
+          unsetExportFunction();
         if ((DebugEnabled) && (DebugIntegrityDump != ""))
             pnt_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
-        if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+        if ((DebugEnabled) && (!getReadFlag() && (DebugIntegrityDump == "")))
             pnt_Serial->println("UC! (" + Command + ")"); // Unknown command print
         Clear();                                          // Clear parampart to prepare for the next input.
     }

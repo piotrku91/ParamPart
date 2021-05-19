@@ -3,8 +3,8 @@
 /* 
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
-2019 - 2020
-v. 3.5
+2019 - 2021
+v. 3.6
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -29,7 +29,7 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
   Command = "";
   EmptyCut();
   m_SyntaxTest = false;
-  SetReadFlag(false);
+  setReadFlag(false);
   DebugIntegrityDump = "";
   tmpnewLine = "";
 };
@@ -154,14 +154,14 @@ void ParamPart::CheckParamTypes()
 String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
 {
   String tmpReturn = "";
-  if (SyntaxVerify())
+  if (syntaxVerify())
   {                                 //   (SYNTAX OK)
     (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
     if (!(Export_func == nullptr))
-      UnSetExportFunction();
+     unsetExportFunction();
     if ((DebugEnabled) && (DebugIntegrityDump != ""))
       tmpReturn = DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
-    if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+    if ((DebugEnabled) && (!getReadFlag() && (DebugIntegrityDump == "")))
       tmpReturn = "UC! (" + Command + ")"; // Unknown command print
     Clear();                               // Clear parampart to prepare for the next input.
   }
@@ -176,14 +176,14 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const String ParamPart::Glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
+const String ParamPart::glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
 {
   //   Clear();
-  String Glue_hand;
+  String glue_hand;
   String tmpstr;
 
-  Glue_hand = OpenLine + Command; // Dump command
-  Glue_hand += DelimiterChar;
+  glue_hand = OpenLine + Command; // Dump command
+  glue_hand += DelimiterChar;
 
   for (int i; i < m_Max; i++) // Dump parameters
   {
@@ -191,12 +191,12 @@ const String ParamPart::Glue() // You can modify some parameter and stick full c
     if (Params[i][0] != 0)
     {
 
-      Glue_hand += tmpstr + DelimiterChar;
+      glue_hand += tmpstr + DelimiterChar;
     };
   };
 
-  Glue_hand += CloseLine; // Close line
-  return Glue_hand;       // Returns remastered line
+  glue_hand += CloseLine; // Close line
+  return glue_hand;       // Returns remastered line
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,9 +216,9 @@ const String ParamPart::toJSON()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::ReadDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
+String ParamPart::readDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
 {
-  SetReadFlag(true);
+  setReadFlag(true);
   if (RtnMsg)
     return (OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
 };
@@ -252,7 +252,7 @@ String& ParamPart::operator[](uint8_t n) // Overload [] - returns reference to c
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ParamPart::SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine)
+void ParamPart::setSyntaxChars(char OpenLine, char Delimiter, char CloseLine)
 {
   this->OpenLine = OpenLine;
   this->DelimiterChar = DelimiterChar;
@@ -260,14 +260,14 @@ void ParamPart::SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine)
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ParamPart::SetExportFunction(void (*External_Export_func)(const String &))
+void ParamPart::setExportFunction(void (*External_Export_func)(const String &))
 {
   Export_func = External_Export_func;
   CheckIntegrity = false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ParamPart::UnSetExportFunction()
+void ParamPart::unsetExportFunction()
 {
   Export_func = nullptr;
   CheckIntegrity = true;

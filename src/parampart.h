@@ -6,7 +6,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2021
-v. 3.5
+v. 3.6
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -53,30 +53,30 @@ protected:
 public: 
   void Clear();
   bool Header(const String &CmdName, bool Active = true);
-  bool SyntaxVerify() { return m_SyntaxTest; };
+  bool syntaxVerify() { return m_SyntaxTest; };
   String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
-  String ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
+  String readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
   bool Slicer(String &LineS);
   bool CSlicer(char Line[]);
  
 
   // **Set functions
-  void SetReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
-  void SetDebugMode(bool DebugStatus) { DebugEnabled = DebugStatus; };
-  void SetIntegrityCheck(bool IntegrityStatus) { CheckIntegrity = IntegrityStatus; };
-  void SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine);
-  void SetExportFunction(void (*External_Export_func)(const String &));
-  void UnSetExportFunction();
+  void setReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
+  void setDebugMode(bool DebugStatus) { DebugEnabled = DebugStatus; };
+  void setIntegrityCheck(bool IntegrityStatus) { CheckIntegrity = IntegrityStatus; };
+  void setSyntaxChars(char OpenLine, char Delimiter, char CloseLine);
+  void setExportFunction(void (*External_Export_func)(const String &));
+  void unsetExportFunction();
 
  // **Get functions
   const int size() { return m_ParamReadCount; };
-  bool GetReadFlag() const { return m_ReadFlag; };
-  const String GetParam(uint8_t n) const { return Params[n]; };
-  const String GetCommand() { return Command; };
-  const String GetFullCommand() { return OpenLine + Command + DelimiterChar; };
-  const String GetCloseLine() { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
+  bool getReadFlag() const { return m_ReadFlag; };
+  String getParam(uint8_t n) const { return Params[n]; };
+  const String getParam() { return Command; };
+  const String getFullCommand() { return OpenLine + Command + DelimiterChar; };
+  const String getCloseLine() { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
   const String toJSON(); // Export Params to JSON format.
-  const String Glue();
+  const String glue();
 
 
   // Protectedfunctions
@@ -238,14 +238,14 @@ public:
   String Interpreter(T *M, void (T::*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
   {
     String tmpReturn = "";
-    if (SyntaxVerify())
+    if (syntaxVerify())
     {                                    //   (SYNTAX OK)
       (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
       if (!(Export_func == nullptr))
-        UnSetExportFunction();
+        unsetExportFunction();
       if ((DebugEnabled) && (DebugIntegrityDump != ""))
         tmpReturn = DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
-      if ((DebugEnabled) && (!GetReadFlag() && (DebugIntegrityDump == "")))
+      if ((DebugEnabled) && (!getReadFlag() && (DebugIntegrityDump == "")))
         tmpReturn = "UC! (" + Command + ")"; // Unknown command print
       Clear();                               // Clear parampart to prepare for the next input.
     }

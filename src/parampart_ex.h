@@ -7,7 +7,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr Kupczyk (dajmosster@gmail.com) 
 2019 - 2021
-v. 3.5
+v. 3.6
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -28,7 +28,7 @@ public:
     void HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP));
     void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP));
     String RawRead();
-    void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
+    void readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
 
     // Constructors for extended class
     ParamPart_Ex(ParamPart_Ex<SerialType>&) = delete; // disable copy constructor
@@ -55,11 +55,11 @@ public:
     void Interpreter(T *M, void (T::*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP))
     {
 
-        if (SyntaxVerify())
+        if (syntaxVerify())
         {                                      //   (SYNTAX OK)
             (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
             if (!(Export_func == nullptr))
-                UnSetExportFunction();
+                unsetExportFunction();
             if ((DebugEnabled) && (DebugIntegrityDump != ""))
                 pnt_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
             if ((DebugEnabled) && (!Getm_ReadFlag() && (DebugIntegrityDump == "")))
@@ -76,5 +76,7 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 };
+
+#include "parampart_ex.cpp" // Include functions file to link everything properly.
 
 #endif

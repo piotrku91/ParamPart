@@ -1,11 +1,10 @@
-#ifndef PARAMPART_EX_H
-#define PARAMPART_EX_H
+#pragma once
 #include "parampart.h"
 #include <Arduino.h>
 
 /* 
 Arduino Serial String Data Splitter - ParamPart
-Written by Piotr Kupczyk (dajmosster@gmail.com) 
+Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
 v. 3.6
 
@@ -78,4 +77,4 @@ public:
 
 #include "parampart_ex.cpp" // Include functions file to link everything properly.
 
-#endif
+

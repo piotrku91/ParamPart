@@ -1,11 +1,11 @@
 #include "parampart_ex.h"
-#include "parampart_ex.cpp" // Include cpp file as well for create and link all functions from library.
+
 
 //#include "SoftwareSerial.h" // For use ParamPart_Ex with Software Serial
 
 /* 
 Arduino Serial String Data Splitter - ParamPart
-Written by Piotr Kupczyk (dajmosster@gmail.com) 
+Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
 v. 3.5
 

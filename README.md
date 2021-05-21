@@ -1,7 +1,7 @@
 # ParamPart
 Arduino Serial String Data Splitter  - ParamPart / ParamPart_Ex
 
-Written by Piotr Kupczyk (dajmosster@gmail.com) 
+Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 
 Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)

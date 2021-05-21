@@ -1,12 +1,10 @@
 #include "parampart_ex.h"
-#include "parampart_ex.cpp"
-#include "HardwareSerial.h"
 
 /* 
 Arduino Serial String Data Splitter - ParamPart
-Written by Piotr Kupczyk (dajmosster@gmail.com) 
+Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
-v. 3.5
+v. 3.6
 
 Github: https://github.com/piotrku91/ParamPart/
 

@@ -7,7 +7,7 @@ Tested on Arduino Uno and Arduino Mega.
 Used IDE: Arduino IDE 1.8.13 / Visual Studio Code 1.50.1 (Linux)
 
 2019 - 2021
-v. 3.5
+v. 3.6
 
 **It's easy to put in your prototype project and debug, send, receive parameters by string lines.**
 
@@ -30,19 +30,19 @@ And you can do something by Reaction function:
     if (P.Header("test")) // Simple example of respond
     {
         Serial.println("Hi!");
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if (P.Header("js")) // Example of export ParamPart parameters to JSON format
     {
         Serial.println(P.toJSON());
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if ((P.Header("abc")) && P.Integrity(PT::Txt, PT::Num, PT::Num))
     {
         Serial.print("Hi ");
-        Serial.print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
+        Serial.print(P[0]); // [] is overloaded, so you can use P[0] instead of P.getParam(0).
         Serial.print(", you have ");
         Serial.print(P[1]);
         Serial.print(" years old and ");
@@ -54,15 +54,15 @@ And you can do something by Reaction function:
             Serial.println(pa);
         }; // Print all parameters by range-based loop.
 
-        P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed              command)
+        P.readDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed              command)
                       // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if (P("db", true, PT::Num)) // Change debug mode
                                 // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
     {
-        P.SetDebugMode(P[0].toInt());
-        P.ReadDone();
+        P.setDebugMode(P[0].toInt());
+        P.readDone();
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ And you can do something by Reaction function:
     {
         // If pass integrity checks, i'm not scared to conversion P[0] to int.
         digitalWrite(LED_BUILTIN, (P[0].toInt()));
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
        };
@@ -143,14 +143,14 @@ and get some return <artn;abc;OK;>
 
 **String RawRead()** - Read String from Serial and store in tmpnewLine variable. (No interpreting)
 
-**void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version it's going straight away to Serial)
+**void readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version it's going straight away to Serial)
 
 
 ## Main functions (ParamPart)
 
 **String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP))**  - Checks syntax, and call function from pointer. But in this version function returns String with Flag about reaction process or nothing if everything is OK. (Reaction function)
 
-**void ReadDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version function returns only string)
+**void readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version function returns only string)
 
 
 ## Main functions (both)
@@ -186,14 +186,14 @@ and get some return <artn;abc;OK;>
 
 ## Settings and other functions
 
-**SetDebugMode(bool DebugStatus)** - Enable/Disable debug return.
+**setDebugMode(bool DebugStatus)** - Enable/Disable debug return.
 
-**SetIntegrityCheck(bool IntegrityStatus)** - Enable/Disable Integrity checks. (Pass everything)
+**setIntegrityCheck(bool IntegrityStatus)** - Enable/Disable Integrity checks. (Pass everything)
 
-**SetExportFunction(*External_Export_func)(const String&))** - Enable function for dump all reaction commands. After Reaction function is reset to nullptr.
+**setExportFunction(*External_Export_func)(const String&))** - Enable function for dump all reaction commands. After Reaction function is reset to nullptr.
 
-**SetSyntaxChars(char OpenLine, char Delimiter, char CloseLine)** - Customize your syntax as you like
+**setSyntaxChars(char OpenLine, char Delimiter, char CloseLine)** - Customize your syntax as you like
 
-**bool GetReadFlag()** - Returns if some reaction is done.
+**bool getReadFlag()** - Returns if some reaction is done.
 
-**bool GetParam(n)** - Returns parameter with index n (it's same like in example: P[n])
+**bool getParam(n)** - Returns parameter with index n (it's same like in example: P[n])

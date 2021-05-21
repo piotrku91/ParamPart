@@ -2,31 +2,32 @@
 # Syntax Coloring Map 
 #######################################
 
-pnt_Serial KEYWORD 1
+ptr_Serial KEYWORD 1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 Clear	KEYWORD2
 Header	KEYWORD2
-GetReadFlag	KEYWORD2
+getReadFlag	KEYWORD2
 Slicer	KEYWORD2
 CSlicer	KEYWORD2
-SetReadFlag	KEYWORD2
-SetDebugMode	KEYWORD2
-SetIntegrityCheck	KEYWORD2
+setReadFlag	KEYWORD2
+setDebugMode	KEYWORD2
+setIntegrityCheck	KEYWORD2
 SyntaxVerify	KEYWORD2
 Integrity	KEYWORD2
 EmptyCut	KEYWORD2
 CheckParamTypes	KEYWORD2
-SetExportFunction	KEYWORD2
+setExportFunction	KEYWORD2
 Interpreter	KEYWORD2
 HybridInterpreter	KEYWORD2
 RawRead	KEYWORD2
-Readed	KEYWORD2
+readDone	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
-STRING	LITERAL1
-NUMBER	LITERAL1
+PT::Num	LITERAL1
+PT::Txt	LITERAL1
+PT::Any	LITERAL1

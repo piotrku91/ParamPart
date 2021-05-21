@@ -19,8 +19,13 @@ Github: https://github.com/piotrku91/ParamPart/
 #define CHECK_INTEGRITY_DEFAULT_STATUS true
 #define DEBUG_DEFAULT_STATUS true
 
-enum class PT {Num=0,Txt=1,Any=2}; // Types to use with integrity checks. Use like PT::Num, PT::Txt, PT::Any as arguments in Integrity function.
-const String DebugNames[3] = {{"[Num]"},{"[Txt]"},{"[Any]"}};
+enum class PT
+{
+  Num = 0,
+  Txt = 1,
+  Any = 2
+}; // Types to use with integrity checks. Use like PT::Num, PT::Txt, PT::Any as arguments in Integrity function.
+const String DebugNames[3] = {{"[Num]"}, {"[Txt]"}, {"[Any]"}};
 
 class ParamPart // Arduino String Serial Data Splitter
 {
@@ -35,8 +40,8 @@ protected:
   bool m_SyntaxTest;
   bool m_ReadFlag;
 
-  String* Params; // Params String Table (dynamic array)
-  PT* RType; // Params Type Table (dynamic array)
+  String *Params; // Params String Table (dynamic array)
+  PT *RType;      // Params Type Table (dynamic array)
 
   String tmpnewLine; // Workflow variable
 
@@ -50,7 +55,7 @@ protected:
   void (*Export_func)(const String &);
 
   // Public functions
-public: 
+public:
   void Clear();
   bool Header(const String &CmdName, bool Active = true);
   bool syntaxVerify() { return m_SyntaxTest; };
@@ -58,7 +63,6 @@ public:
   String readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
   bool Slicer(String &LineS);
   bool CSlicer(char Line[]);
- 
 
   // **Set functions
   void setReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
@@ -68,16 +72,15 @@ public:
   void setExportFunction(void (*External_Export_func)(const String &));
   void unsetExportFunction();
 
- // **Get functions
+  // **Get functions
   const int size() { return m_ParamReadCount; };
   bool getReadFlag() const { return m_ReadFlag; };
   String getParam(uint8_t n) const { return Params[n]; };
-  const String getParam() { return Command; };
-  const String getFullCommand() { return OpenLine + Command + DelimiterChar; };
-  const String getCloseLine() { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
-  const String toJSON(); // Export Params to JSON format.
-  const String glue();
-
+  String getCommand() const { return Command; };
+  String getFullCommand() const { return OpenLine + Command + DelimiterChar; };
+  String getCloseLine() const { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
+  String toJSON(); // Export Params to JSON format.
+  String glue();
 
   // Protectedfunctions
 protected:
@@ -89,7 +92,7 @@ public:
   void operator<<(const char Line[]);
   void operator<<(char Line[]);
   void operator<<(String &Line);
-  String& operator[](uint8_t n);
+  String &operator[](uint8_t n) const;
 
   // First and last element for range-based loops
   String *begin() { return &Params[0]; }
@@ -98,13 +101,13 @@ public:
   // Constructors
 
   // Constructor for default syntax
-  ParamPart(ParamPart&) = delete;
-  ParamPart() : ParamPart(9,'<', ';', '>'){}; // Delegated to Constructor with overloaded syntax.
-  ParamPart(const int& size) : ParamPart(size,'<', ';', '>'){}; // Delegated to Constructor with overloaded syntax.
+  ParamPart(ParamPart &) = delete;
+  ParamPart() : ParamPart(9, '<', ';', '>'){};                   // Delegated to Constructor with overloaded syntax.
+  ParamPart(const int &size) : ParamPart(size, '<', ';', '>'){}; // Delegated to Constructor with overloaded syntax.
 
   // Constructor with overloaded syntax.
-  ParamPart(const int& size, char OL, char DL, char CL)
-      : m_Max(size), Params(new String[m_Max]), RType(new PT[m_Max]), OpenLine(OL),  DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+  ParamPart(const int &size, char OL, char DL, char CL)
+      : m_Max(size), Params(new String[m_Max]), RType(new PT[m_Max]), OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
         DebugEnabled(DEBUG_DEFAULT_STATUS), m_ParamReadCount(0), m_SyntaxTest(false), m_ReadFlag(false), Export_func(nullptr)
   {
     Clear();
@@ -112,11 +115,12 @@ public:
 
   // Destructor
 
-  ~ParamPart() {
+  ~ParamPart()
+  {
     // Free tables
-     delete[] Params; 
-     delete[] RType;
-     }
+    delete[] Params;
+    delete[] RType;
+  }
 
   ///////////////////////////////////////////////////// TEMPLATES - FUNCTIONS /////////////////////////////////////////////////////////////////
 
@@ -135,17 +139,20 @@ public:
     {
       if (DebugEnabled)
       {
-        if (TypeExp==PT::Txt) {
-        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
+        if (TypeExp == PT::Txt)
+        {
+          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
         };
-        if (TypeExp==PT::Num) {
-        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
+        if (TypeExp == PT::Num)
+        {
+          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
         };
-        if (TypeExp==PT::Any) {
-        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
+        if (TypeExp == PT::Any)
+        {
+          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
         };
       };
-      if ((TypeExp == RType[Counter] || (TypeExp==PT::Any)) && (tmpITest))
+      if ((TypeExp == RType[Counter] || (TypeExp == PT::Any)) && (tmpITest))
       {
         tmpITest = true;
       }
@@ -158,7 +165,7 @@ public:
   };
 
   template <typename... TPack>
-  bool Integrity(TPack &&... args) // Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS). Don't need specify of amount expected parameters.
+  bool Integrity(TPack &&...args) // Expanded version of Integrity, It's possible now to use more than 9 arguments (and Max is set by MAX_PARAMS). Don't need specify of amount expected parameters.
   {
 
     uint8_t InputExpectedParams = (sizeof...(TPack));
@@ -191,14 +198,17 @@ public:
       DebugIntegrityDump += " / R: ";
       for (int i = 0; i < m_ParamReadCount; i++)
       {
-             if (RType[i]==PT::Txt) {
-        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
+        if (RType[i] == PT::Txt)
+        {
+          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
         };
-        if (RType[i]==PT::Num) {
-        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
+        if (RType[i] == PT::Num)
+        {
+          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
         };
-        if (RType[i]==PT::Any) {
-        DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
+        if (RType[i] == PT::Any)
+        {
+          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
         };
       };
       DebugIntegrityDump += " MM!"; // mismatch parameters default set
@@ -216,7 +226,7 @@ public:
   //                                  Template for overload () operator Function
 
   template <typename... TPack>
-  bool operator()(const String &CMD, const bool &Active, TPack &&... args)
+  bool operator()(const String &CMD, const bool &Active, TPack &&...args)
   {
     return ((Header(CMD, Active)) && Integrity(args...));
   };

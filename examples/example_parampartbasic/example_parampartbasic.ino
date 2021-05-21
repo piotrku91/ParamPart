@@ -32,26 +32,26 @@ void Reaction(ParamPart &P)
     if (P.Header("test")) // Simple example of respond
     {
         Serial.println("Hi!");
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    if (P.Header("test2"), false) // Simple example of respond (If second argument is false, this block of reaction is deactivated)
+    if (P.Header("test2",false)) // Simple example of respond (If second argument is false, this block of reaction is deactivated)
     {
         Serial.println("Hi!");
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     if (P.Header("js")) // Example of export ParamPart parameters to JSON format
     {
         Serial.println(P.toJSON());
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if ((P.Header("abc")) && P.Integrity(PT::Txt, PT::Num, PT::Num))
     {
         Serial.print("Hi ");
-        Serial.print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
+        Serial.print(P[0]); // [] is overloaded, so you can use P[0] instead of P.getParam(0).
         Serial.print(", you have ");
         Serial.print(P[1]);
         Serial.print(" years old and ");
@@ -63,7 +63,7 @@ void Reaction(ParamPart &P)
             Serial.println(pa);
         }; // Print all parameters by range-based loop.
 
-        P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
+        P.readDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
                       // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,8 +71,8 @@ void Reaction(ParamPart &P)
                                 // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
     {
 
-        P.SetDebugMode(P[0].toInt());
-        P.ReadDone();
+        P.setDebugMode(P[0].toInt());
+        P.readDone();
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ void Reaction(ParamPart &P)
     {
         // If pass integrity checks, i'm not scared to conversion P[0] to int.
         digitalWrite(LED_BUILTIN, (P[0].toInt()));
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
 };

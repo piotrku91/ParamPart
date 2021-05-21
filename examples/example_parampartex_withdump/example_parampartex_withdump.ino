@@ -53,21 +53,21 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex class by reference
 
   if (P.Header("ex")) // Export implemented commands (Headers). Should be first block in Reaction function to dump everything.
   {
-    P.SetExportFunction(&FoundCmd); // Execute function which is listing implemented commands (Headers)
-    P.ReadDone(false);
+    P.setExportFunction(&FoundCmd); // Execute function which is listing implemented commands (Headers)
+    P.readDone(false);
   };
 
   if ((P.Header("abc")) && (P.Integrity(PT::Txt, PT::Num, PT::Num)))
   {
-    P.pnt_Serial->print("Hi ");
-    P.pnt_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
-    P.pnt_Serial->print(", you have ");
-    P.pnt_Serial->print(P[1]);
-    P.pnt_Serial->print(" years old and ");
-    P.pnt_Serial->print(P[2]);
-    P.pnt_Serial->println(" cm.  ");
+    P.ptr_Serial->print("Hi ");
+    P.ptr_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.getParam(0).
+    P.ptr_Serial->print(", you have ");
+    P.ptr_Serial->print(P[1]);
+    P.ptr_Serial->print(" years old and ");
+    P.ptr_Serial->print(P[2]);
+    P.ptr_Serial->println(" cm.  ");
 
-    P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
+    P.readDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
                   // Always use this function after finish your reaction block. It's setting ReadFlag.
   };
 
@@ -75,7 +75,7 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex class by reference
   {
     // If pass integrity checks, i'm not scared to conversion P[0] to int.
     digitalWrite(LED_BUILTIN, (P[0].toInt()));
-    P.ReadDone();
+    P.readDone();
   };
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

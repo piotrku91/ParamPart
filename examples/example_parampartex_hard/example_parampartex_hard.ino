@@ -53,40 +53,40 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex object by reference (
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if (P.Header("test")) // Simple example of respond
     {
-        P.pnt_Serial->println("Hi!");
-        P.ReadDone();
+        P.ptr_Serial->println("Hi!");
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if (P.Header("test2"), false) // Simple example of respond (If second argument is false, this block of reaction is deactivated)
     {
-        P.pnt_Serial->println("Hi!");
-        P.ReadDone();
+        P.ptr_Serial->println("Hi!");
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     if (P.Header("js")) // Example of export ParamPart parameters to JSON format
     {
-        P.pnt_Serial->println(P.toJSON());
-        P.ReadDone();
+        P.ptr_Serial->println(P.toJSON());
+        P.readDone();
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if ((P.Header("abc")) && P.Integrity(PT::Txt, PT::Num, PT::Num))
     {
-        P.pnt_Serial->print("Hi ");
-        P.pnt_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.GetParam(0).
-        P.pnt_Serial->print(", you have ");
-        P.pnt_Serial->print(P[1]);
-        P.pnt_Serial->print(" years old and ");
-        P.pnt_Serial->print(P[2]);
-        P.pnt_Serial->println(" cm.  ");
+        P.ptr_Serial->print("Hi ");
+        P.ptr_Serial->print(P[0]); // [] is overloaded, so you can use P[0] instead of P.getParam(0).
+        P.ptr_Serial->print(", you have ");
+        P.ptr_Serial->print(P[1]);
+        P.ptr_Serial->print(" years old and ");
+        P.ptr_Serial->print(P[2]);
+        P.ptr_Serial->println(" cm.  ");
 
         for (auto &pa : P)
         {
-            P.pnt_Serial->println(pa);
+            P.ptr_Serial->println(pa);
         }; // Print all parameters by range-based loop.
 
-        P.ReadDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
+        P.readDone(); // (bool RtnMsg, String ParamRtn, String Rtn) - You can configure return output (true or false, return data, return name of executed command)
                       // Always use this function after finish your reaction block. It's setting ReadFlag.
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,15 +94,15 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex object by reference (
     {
         // If pass integrity checks, i'm not scared to conversion P[0] to int.
         digitalWrite(LED_BUILTIN, (P[0].toInt()));
-        P.ReadDone();
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if (P("db", true, PT::Num)) // Change debug mode
                                 // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
     {
 
-        P.SetDebugMode(P[0].toInt());
-        P.ReadDone();
+        P.setDebugMode(P[0].toInt());
+        P.readDone();
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if ((P.Header("cmp")) && P.Integrity(PT::Num, PT::Num)) // Compare and send sum by return example (Expanded version test)
@@ -112,12 +112,12 @@ void Reaction(ParamPart_Ex<> &P) // Access to ParamPart_Ex object by reference (
         if (P[0] < P[1])
             Serial.print("2nd");
         if (P[0] == P[1])
-            P.pnt_Serial->println("same");
+            P.ptr_Serial->println("same");
         else
-            P.pnt_Serial->println(" is bigger");
+            P.ptr_Serial->println(" is bigger");
 
         int sum = (P[0].toInt() + P[1].toInt()); // Do some example maths and return as parameter.
-        P.ReadDone(true, static_cast<String>(sum));
+        P.readDone(true, static_cast<String>(sum));
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
 };

@@ -100,7 +100,6 @@ bool ParamPart::Slicer(String &LineS) // Main function to split line to command 
   else
   // PASS //
   {
-
     int NextDel = LineS.indexOf(DC);       // Find first delimiter
     Command = LineS.substring(1, NextDel); // Copy command to variable
     LineS.remove(0, NextDel + 1);          // Delete from the begin to first delimiter + 1
@@ -125,7 +124,7 @@ bool ParamPart::Slicer(String &LineS) // Main function to split line to command 
 
 void ParamPart::CheckParamTypes()
 {
-    for (int i = 0; i < m_ParamReadCount; i++) // Clear types
+  for (int i = 0; i < m_ParamReadCount; i++) // Clear types
   {
     RType[i] = PT::Any; // Set types default to NUMBER
   };
@@ -133,23 +132,21 @@ void ParamPart::CheckParamTypes()
   for (int i = 0; i < m_ParamReadCount; i++)
   {
 
-  if (Params[i] == "0") // If String is 0 then Param eqals to integer with value 0 (don't need any casting)
-  {
-    RType[i]  = PT::Num; // Set type as integer
-  }
-  else
-  {
-   
-    int TmpType = Params[i].toInt(); // Cast to integer
-    if (TmpType==0) // If is 0 then casting failed so type is string
-      RType[i]  = PT::Txt; // Set type as String
+    if (Params[i] == "0") // If String is 0 then Param eqals to integer with value 0 (don't need any casting)
+    {
+      RType[i] = PT::Num; // Set type as integer
+    }
     else
-      RType[i]  = PT::Num; // Set type
-  };
-  };
+    {
 
+      int TmpType = Params[i].toInt(); // Cast to integer
+      if (TmpType == 0)                // If is 0 then casting failed so type is string
+        RType[i] = PT::Txt;            // Set type as String
+      else
+        RType[i] = PT::Num; // Set type
+    };
+  };
 };
-
 
 String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
 {
@@ -158,7 +155,7 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
   {                                 //   (SYNTAX OK)
     (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
     if (!(Export_func == nullptr))
-     unsetExportFunction();
+      unsetExportFunction();
     if ((DebugEnabled) && (DebugIntegrityDump != ""))
       tmpReturn = DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
     if ((DebugEnabled) && (!getReadFlag() && (DebugIntegrityDump == "")))
@@ -176,7 +173,7 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const String ParamPart::glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
+String ParamPart::glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
 {
   //   Clear();
   String glue_hand;
@@ -201,7 +198,7 @@ const String ParamPart::glue() // You can modify some parameter and stick full c
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const String ParamPart::toJSON()
+String ParamPart::toJSON()
 {
   String tmpJSON = "{\"name\": \"pp_exp\",\"cnt\": \"" + static_cast<String>(m_ParamReadCount) + "\",\"params\":[";
   for (int i = 0; ((i < m_ParamReadCount) && (i < m_Max)); i++)
@@ -245,7 +242,7 @@ void ParamPart::operator<<(String &Line) // Overload << String
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String& ParamPart::operator[](uint8_t n) // Overload [] - returns reference to choosed param
+String &ParamPart::operator[](uint8_t n) const // Overload [] - returns reference to choosed param
 {
 
   return Params[n];

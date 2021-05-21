@@ -12,9 +12,9 @@ template <typename SerialType>
 String ParamPart_Ex<SerialType>::RawRead() //Returns line from Serial or nothing
 {
 
-    if (pnt_Serial->available())
+    if (ptr_Serial->available())
     {
-        tmpnewLine = pnt_Serial->readStringUntil(0);
+        tmpnewLine = ptr_Serial->readStringUntil(0);
     };
 
     return (tmpnewLine[0] != '#') ? tmpnewLine : ""; // If first line is # just return nothing
@@ -26,7 +26,7 @@ template <typename SerialType>
 void ParamPart_Ex<SerialType>::readDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
 {
     if (RtnMsg)
-        pnt_Serial->println(OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
+        ptr_Serial->println(OpenLine + Rtn + DelimiterChar + Command + DelimiterChar + ParamRtn + DelimiterChar + CloseLine);
     setReadFlag(true);
 };
 
@@ -40,26 +40,25 @@ void ParamPart_Ex<SerialType>::Interpreter(void (*ptn_func_interpreter)(ParamPar
     {                                   //   (SYNTAX OK)
         (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
         if (!(Export_func == nullptr))
-          unsetExportFunction();
+            unsetExportFunction();
         if ((DebugEnabled) && (DebugIntegrityDump != ""))
-            pnt_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
+            ptr_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
         if ((DebugEnabled) && (!getReadFlag() && (DebugIntegrityDump == "")))
-            pnt_Serial->println("UC! (" + Command + ")"); // Unknown command print
+            ptr_Serial->println("UC! (" + Command + ")"); // Unknown command print
         Clear();                                          // Clear parampart to prepare for the next input.
     }
     else
     { // (SYNTAX ERROR)
 
         if ((DebugEnabled))
-            pnt_Serial->println("SE!"); // Syntax Error - missing < or ; or >
+            ptr_Serial->println("SE!"); // Syntax Error - missing < or ; or >
     };
 };
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename SerialType>
-void ParamPart_Ex<SerialType>::HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType>  &PP)) // Receive Serial line and Start interpret object.
+void ParamPart_Ex<SerialType>::HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP)) // Receive Serial line and Start interpret object.
 {
     RawRead();
 

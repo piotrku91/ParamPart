@@ -20,6 +20,8 @@ and get some return <artn;abc;OK;>
 
 All data is stored in **ParamPart Object** (in params P[0],P[1]).
 
+Integity you can check by pass enums from PT range (PT::Num - for numeric argument, PT::Txt - for string argument, PT::Any - type not important) to Integrity() function. Check below.
+
 And you can do something by Reaction function:
 
 >

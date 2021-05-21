@@ -1,6 +1,5 @@
-#include "parampart_ex.h"
-
-
+#include <parampart_ex.h>
+#include <HardwareSerial.h>
 //#include "SoftwareSerial.h" // For use ParamPart_Ex with Software Serial
 
 /* 

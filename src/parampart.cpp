@@ -203,7 +203,7 @@ String ParamPart::toJSON()
   String tmpJSON = "{\"name\": \"pp_exp\",\"cnt\": \"" + static_cast<String>(m_ParamReadCount) + "\",\"params\":[";
   for (int i = 0; ((i < m_ParamReadCount) && (i < m_Max)); i++)
   {
-    tmpJSON += "{\"text\":\"" + Params[i] + "\"}";
+    tmpJSON += "{\""+DebugNames[static_cast<int>(RType[i])]+"\":\"" + Params[i] + "\"}";
     if (i != (m_ParamReadCount - 1))
       tmpJSON += ',';
   };
@@ -269,4 +269,14 @@ void ParamPart::unsetExportFunction()
   Export_func = nullptr;
   CheckIntegrity = true;
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ParamPart::modifyParam(int ParamIndex, const String &Value)
+{
+  if ((ParamIndex < m_ParamReadCount) && (ParamIndex < m_Max))
+  {
+    Params[ParamIndex] = Value;
+    return true;
+  }
+  return false;
+}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

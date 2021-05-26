@@ -19,33 +19,47 @@ Github: https://github.com/piotrku91/ParamPart/
 
 enum class PT
 {
-  Num = 0,
-  Txt = 1,
-  Any = 2
+  Num,
+  Txt,
+  Any
 }; // Types to use with integrity checks. Use like PT::Num, PT::Txt, PT::Any as arguments in Integrity function.
-const String DebugNames[3] = {{"[Num]"}, {"[Txt]"}, {"[Any]"}};
 
 class ParamPart // Arduino String Serial Data Splitter
 {
 protected:
+  //////////////////////////// Errors
+  enum class Errors
+  {
+    SyntaxError,
+    UnknownCommand,
+    MissingExtraParameter,
+    Mismatch
+  };
+  String ErrorMsgNames[4] = {{"SE!"}, {"UC!"}, {"MEP!"}, {"MM!"}};
+
+  //////////////////////////// Types
+
+  const String DebugNames[3] = {{"[Num]"}, {"[Txt]"}, {"[Any]"}}; // Debug types text
+  PT *RType;                                                      // Params Type Table (dynamic array)
+
+  //////////////////////////// Members
   const uint8_t m_Max;
   uint8_t m_ParamReadCount;
   bool m_SyntaxTest;
   bool m_ReadFlag;
 
   String *Params; // Params String Table (dynamic array)
-  PT *RType;      // Params Type Table (dynamic array)
 
-  String tmpnewLine; // Workflow variable
-  bool CheckIntegrity;
-  bool DebugEnabled;
-  char DelimiterChar;
-  char OpenLine;
-  char CloseLine;
-  String Command;
+  String m_tmpnewLine; // Workflow variable
+  bool m_CheckIntegrity;
+  bool m_DebugEnabled;
+  char m_DelimiterChar;
+  char m_OpenLine;
+  char m_CloseLine;
+  String m_Command;
   void (*Export_func)(const String &);
-  String DebugIntegrityDump;
-  String RawCopy;
+  String m_DebugIntegrityDump;
+  String m_RawCopy;
 
   // Public functions
 public:
@@ -55,22 +69,21 @@ public:
   String readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
 
   // **Set functions
-  void setDebugMode(bool DebugStatus) { DebugEnabled = DebugStatus; };
-  void setIntegrityCheck(bool IntegrityStatus) { CheckIntegrity = IntegrityStatus; };
-  void setSyntaxChars(char OpenLine, char Delimiter, char CloseLine);
+  void setDebugMode(bool DebugStatus) { m_DebugEnabled = DebugStatus; };
+  void setIntegrityCheck(bool IntegrityStatus) { m_CheckIntegrity = IntegrityStatus; };
+  void setSyntaxChars(char m_OpenLine, char Delimiter, char m_CloseLine);
   bool modifyParam(int ParamIndex, const String &Value); // Raw edit option for Params.
+  void setReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
   void setExportFunction(void (*External_Export_func)(const String &));
   void unsetExportFunction();
 
   // **Get functions
-  const int size() { return m_ParamReadCount; };
-  bool getReadFlag() const { return m_ReadFlag; };
+  int size() { return m_ParamReadCount; };
+  bool getReadFlag() { return m_ReadFlag; };
   String getParam(uint8_t n) const { return Params[n]; };
-  String getCommand() const { return Command; };
-  String getFullCommand() const { return OpenLine + Command + DelimiterChar; };
-  String getCloseLine() const { return static_cast<String>(DelimiterChar) + static_cast<String>(CloseLine); };
-  String getRawCopy() const { return RawCopy; };
-  String getDebugIntegrityDump() const { return DebugIntegrityDump; };
+  String getCommand() { return m_Command; };
+  String getRawCopy() { return m_RawCopy; };
+  String getDebugIntegrityDump() const { return m_DebugIntegrityDump; };
   String toJSON(); // Export Params to JSON format.
   String glue();
 
@@ -81,14 +94,16 @@ protected:
   bool CSlicer(char Line[]);
   void CheckParamTypes();
   void EmptyCut();
-  void setReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
+  String getFullCommand() { return m_OpenLine + m_Command + m_DelimiterChar; };
+  String getCloseLine() const { return static_cast<String>(m_DelimiterChar) + static_cast<String>(m_CloseLine); };
+  const String& getError(Errors Err) {return ErrorMsgNames[static_cast<int>(Err)];};
 
 public:
   // Overload operators
   void operator<<(const char Line[]);
   void operator<<(char Line[]);
   void operator<<(String &Line);
-  String &operator[](uint8_t n) const;
+  String operator[](uint8_t n) const;
 
   // First and last element for range-based loops
   String *begin() const { return &Params[0]; }
@@ -103,8 +118,8 @@ public:
 
   // Constructor with overloaded syntax.
   ParamPart(const int &size, char OL, char DL, char CL) // Main constructor
-      : m_Max(size), Params(new String[m_Max]), RType(new PT[m_Max]), OpenLine(OL), DelimiterChar(DL), CloseLine(CL), DebugIntegrityDump(""), tmpnewLine(""), CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
-        DebugEnabled(DEBUG_DEFAULT_STATUS), m_ParamReadCount(0), m_SyntaxTest(false), m_ReadFlag(false), Export_func(nullptr)
+      : m_Max(size), Params(new String[m_Max]), RType(new PT[m_Max]), m_OpenLine(OL), m_DelimiterChar(DL), m_CloseLine(CL), m_DebugIntegrityDump(""), m_tmpnewLine(""), m_CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+        m_DebugEnabled(DEBUG_DEFAULT_STATUS), m_ParamReadCount(0), m_SyntaxTest(false), m_ReadFlag(false), Export_func(nullptr)
   {
     Clear();
   };
@@ -133,19 +148,19 @@ public:
   {
     if ((Counter <= Amount - 1) && (Counter <= m_Max))
     {
-      if (DebugEnabled)
+      if (m_DebugEnabled)
       {
         if (TypeExp == PT::Txt)
         {
-          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
+          m_DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
         };
         if (TypeExp == PT::Num)
         {
-          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
+          m_DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
         };
         if (TypeExp == PT::Any)
         {
-          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
+          m_DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
         };
       };
       if ((TypeExp == RType[Counter] || (TypeExp == PT::Any)) && (tmpITest))
@@ -165,23 +180,23 @@ public:
   {
 
     uint8_t InputExpectedParams = (sizeof...(TPack));
-    if (!CheckIntegrity)
+    if (!m_CheckIntegrity)
     {
       return true;
     }; // If function is disabled just pass integrity test.
     if (InputExpectedParams != m_ParamReadCount)
     {
-      if (DebugEnabled)
+      if (m_DebugEnabled)
       {
-        DebugIntegrityDump = "MEP";
+        m_DebugIntegrityDump = "MEP";
       };            // Missing/Extra expected parameters
       return false; // Fail integrity test.
     };
 
     CheckParamTypes();
-    if (DebugEnabled)
+    if (m_DebugEnabled)
     {
-      DebugIntegrityDump = "E: ";
+      m_DebugIntegrityDump = "E: ";
     };
 
     uint8_t tmpCounter = 0; // Counter for ArgAccess function.
@@ -189,32 +204,32 @@ public:
 
     PassF_TPack{(ArgAccess(InputExpectedParams, tmpCounter, tmpITest, args), 1)...}; // Call access function to get arguments
 
-    if (DebugEnabled)
+    if (m_DebugEnabled)
     {
-      DebugIntegrityDump += " / R: ";
+      m_DebugIntegrityDump += " / R: ";
       for (int i = 0; i < m_ParamReadCount; i++)
       {
         if (RType[i] == PT::Txt)
         {
-          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
+          m_DebugIntegrityDump += DebugNames[static_cast<int>(PT::Txt)];
         };
         if (RType[i] == PT::Num)
         {
-          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
+          m_DebugIntegrityDump += DebugNames[static_cast<int>(PT::Num)];
         };
         if (RType[i] == PT::Any)
         {
-          DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
+          m_DebugIntegrityDump += DebugNames[static_cast<int>(PT::Any)];
         };
       };
-      DebugIntegrityDump += " MM!"; // mismatch parameters default set
+      m_DebugIntegrityDump += " MM!"; // mismatch parameters default set
     };
 
     if (!tmpITest)
       return false; // Found mismatch -> Fail integrity test
 
-    DebugIntegrityDump = ""; // if pass integrity test just clean debug (delete default MM!)
-    return true;             // Parameters match -> Pass integrity test
+    m_DebugIntegrityDump = ""; // if pass integrity test just clean debug (delete default MM!)
+    return true;               // Parameters match -> Pass integrity test
   };
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -249,16 +264,16 @@ public:
       (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
       if (!(Export_func == nullptr))
         unsetExportFunction();
-      if ((DebugEnabled) && (DebugIntegrityDump != ""))
-        tmpReturn = DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
-      if ((DebugEnabled) && (!getReadFlag() && (DebugIntegrityDump == "")))
-        tmpReturn = "UC! (" + Command + ")"; // Unknown command print
-      Clear();                               // Clear parampart to prepare for the next input.
+      if ((m_DebugEnabled) && (m_DebugIntegrityDump != ""))
+        tmpReturn = m_DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
+      if ((m_DebugEnabled) && (!getReadFlag() && (m_DebugIntegrityDump == "")))
+        tmpReturn = "UC! (" + m_Command + ")"; // Unknown command print
+      Clear();                                 // Clear parampart to prepare for the next input.
     }
     else
     { // (SYNTAX ERROR)
 
-      if ((DebugEnabled))
+      if ((m_DebugEnabled))
         tmpReturn = "SE!"; // Syntax Error - missing < or ; or >
     };
     return tmpReturn;

@@ -21,20 +21,23 @@ class ParamPart_Ex final : public ParamPart // Extended Arduino Serial Data Spli
 {
 
 public:
-    SerialType *ptr_Serial; // Pointer to Serial Object (HardwareSerial/SoftwareSerial)
+   const SerialType * const ptr_Serial; // Pointer to Serial Object (HardwareSerial/SoftwareSerial)
 
     // Overloaded functions from basic version
     void HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP));
     void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP));
     String RawRead();
     void readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
+    bool ptrCheck() {if (ptr_Serial) {return true;}; return false;};
 
     // Constructors for extended class
     ParamPart_Ex(ParamPart_Ex<SerialType> &) = delete; // disable copy constructor
     ParamPart_Ex() = delete;                           // disable default constructor
 
+    
     ParamPart_Ex(SerialType *WS, char OL = '<', char DL = ';', char CL = '>') : ParamPart(9, OL, DL, CL), ptr_Serial(WS){};
     ParamPart_Ex(SerialType *WS, int size) : ParamPart(size), ptr_Serial(WS){};
+    ParamPart_Ex(SerialType *WS, int size, char OL = '<', char DL = ';', char CL = '>') : ParamPart(size, OL, DL, CL), ptr_Serial(WS){};
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,27 +55,30 @@ public:
     template <typename T>
     void Interpreter(T *M, void (T::*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP))
     {
+        if (!ptrCheck()) {return ;};
 
         if (syntaxVerify())
         {                                      //   (SYNTAX OK)
             (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
             if (!(Export_func == nullptr))
                 unsetExportFunction();
-            if ((DebugEnabled) && (DebugIntegrityDump != ""))
-                ptr_Serial->println(DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
-            if ((DebugEnabled) && (!Getm_ReadFlag() && (DebugIntegrityDump == "")))
-                ptr_Serial->println("UC! (" + Command + ")"); // Unknown command print
+            if ((m_DebugEnabled) && (m_DebugIntegrityDump != ""))
+                ptr_Serial->println(m_DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
+            if ((m_DebugEnabled) && (!Getm_ReadFlag() && (m_DebugIntegrityDump == "")))
+                ptr_Serial->println("UC! (" + m_Command + ")"); // Unknown command print
             Clear();                                          // Clear parampart to prepare for the next input.
         }
         else
         { // (SYNTAX ERROR)
 
-            if ((DebugEnabled))
+            if ((m_DebugEnabled))
                 ptr_Serial->println("SE!"); // Syntax Error - missing < or ; or >
         };
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    
 };
 
 #include "parampart_ex.cpp" // Include functions file to link everything properly.

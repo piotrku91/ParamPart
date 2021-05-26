@@ -66,7 +66,7 @@ void Reaction(ParamPart &P)
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if (P("db", true, PT::Num)) // Change debug mode
-                                // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
+                                // (Example of use short version - overloaded () for ParamPart object. Arguments: m_Command, Status of active command, Expected parameters).
     {
 
         P.setDebugMode(P[0].toInt());

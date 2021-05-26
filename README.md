@@ -61,7 +61,7 @@ And you can do something by Reaction function:
     };
     ////////////////////////////////////////////////////////////////////////////////////////////////
     if (P("db", true, PT::Num)) // Change debug mode
-                                // (Example of use short version - overloaded () for ParamPart object. Arguments: Command, Status of active command, Expected parameters).
+                                // (Example of use short version - overloaded () for ParamPart object. Arguments: m_Command, Status of active command, Expected parameters).
     {
         P.setDebugMode(P[0].toInt());
         P.readDone();
@@ -143,7 +143,7 @@ and get some return <artn;abc;OK;>
 
 **void Interpreter(void (*ptn_func_interpreter)(ParamPart_Ex <> &PP))**  - Checks syntax, and call function from pointer. (Reaction function)
 
-**String RawRead()** - Read String from Serial and store in tmpnewLine variable. (No interpreting)
+**String RawRead()** - Read String from Serial and store in m_tmpnewLine variable. (No interpreting)
 
 **void readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn")** - Set ReadFlag as true, and create some return message (In this version it's going straight away to Serial)
 
@@ -157,7 +157,7 @@ and get some return <artn;abc;OK;>
 
 ## Main functions (both)
 
-**bool Header(const String& CmdName,bool& Active)** - Checks if input Command is one of defined Reaction blocks command.
+**bool Header(const String& CmdName,bool& Active)** - Checks if input m_Command is one of defined Reaction blocks command.
 
 **bool Slicer(String& LineS)** - Parse String by designated syntax and store in ParamPart object.
 
@@ -178,7 +178,7 @@ and get some return <artn;abc;OK;>
 
 **MEP** - Missing/Extra Parameter
 
-**UC** - Unknown Command
+**UC** - Unknown m_Command
 
 **MM** - Mismatch between received and expected parameters.
 
@@ -194,7 +194,7 @@ and get some return <artn;abc;OK;>
 
 **setExportFunction(*External_Export_func)(const String&))** - Enable function for dump all reaction commands. After Reaction function is reset to nullptr.
 
-**setSyntaxChars(char OpenLine, char Delimiter, char CloseLine)** - Customize your syntax as you like
+**setSyntaxChars(char m_OpenLine, char Delimiter, char m_CloseLine)** - Customize your syntax as you like
 
 **bool getReadFlag()** - Returns if some reaction is done.
 

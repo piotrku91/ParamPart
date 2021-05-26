@@ -6,7 +6,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
-v. 3.6
+v. 3.7
 
 Github: https://github.com/piotrku91/ParamPart/
 

@@ -5,7 +5,7 @@
 Arduino Serial String Data Splitter  - ParamPart_Ex (Extended Version with Serial Receiver)
 Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
-v. 3.6
+v. 3.7
 */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <typename SerialType>
@@ -45,14 +45,14 @@ if (!ptrCheck()) {return ;};
         if ((m_DebugEnabled) && (m_DebugIntegrityDump != ""))
             ptr_Serial->println(m_DebugIntegrityDump); // Debug Integrity error print (if is ok, nothing to print)
         if ((m_DebugEnabled) && (!getReadFlag() && (m_DebugIntegrityDump == "")))
-            ptr_Serial->println("UC! (" + m_Command + ")"); // Unknown command print
+            ptr_Serial->println(getError(Errors::UnknownCommand)+" (" + m_Command + ")"); // Unknown command print
         Clear();                                            // Clear parampart to prepare for the next input.
     }
     else
     { // (SYNTAX ERROR)
 
         if ((m_DebugEnabled))
-            ptr_Serial->println("SE!"); // Syntax Error - missing < or ; or >
+            ptr_Serial->println(getError(Errors::SyntaxError)); // Syntax Error - missing < or ; or >
     };
 };
 

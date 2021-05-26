@@ -3,7 +3,7 @@
   Arduino Serial Serial Data Splitter - ParamPart Basic Example
   Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
   2019 - 2021
-  v. 3.6
+  v. 3.7
 
  In this version you need to pass String to ParamPart Object manualy from Serial or Script file, whatever you want :) 
  

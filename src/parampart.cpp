@@ -4,7 +4,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
-v. 3.6
+v. 3.7
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -48,8 +48,9 @@ bool ParamPart::Header(const String &CmdName, bool Active) // Compare expected c
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool ParamPart::CSlicer(char Line[]) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>) - Old C String Version
+// Old version of Slicer (CString) - It is deavtivated and will be delete in the future.
+#if 0 
+bool ParamPart::CSlicer(char Line[]) 
 {
   Clear();
   int i = 0;
@@ -81,6 +82,8 @@ bool ParamPart::CSlicer(char Line[]) // Main function to split line to command a
   m_SyntaxTest = true;
   return true;
 };
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -159,14 +162,14 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
     if ((m_DebugEnabled) && (m_DebugIntegrityDump != ""))
       tmpReturn = m_DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
     if ((m_DebugEnabled) && (!getReadFlag() && (m_DebugIntegrityDump == "")))
-      tmpReturn = "UC! (" + m_Command + ")"; // Unknown command print
+      tmpReturn = getError(Errors::UnknownCommand)+" (" + m_Command + ")"; // Unknown command print
     Clear();                               // Clear parampart to prepare for the next input.
   }
   else
   { // (SYNTAX ERROR)
 
     if ((m_DebugEnabled))
-      tmpReturn = "SE!"; // Syntax Error - missing < or ; or >
+      tmpReturn = getError(Errors::SyntaxError); // Syntax Error - missing < or ; or >
   };
   return tmpReturn;
 };
@@ -228,11 +231,6 @@ void ParamPart::operator<<(const char Line[]) // Overload << const char[]
   Slicer(m_tmpnewLine);
 }
 
-void ParamPart::operator<<(char Line[]) // Overload << char[]
-{
-  m_tmpnewLine = Line;
-  Slicer(m_tmpnewLine);
-}
 
 void ParamPart::operator<<(String &Line) // Overload << String
 {
@@ -244,7 +242,6 @@ void ParamPart::operator<<(String &Line) // Overload << String
 
 String ParamPart::operator[](uint8_t n) const// Overload [] - returns reference to choosed param
 {
-
   return Params[n];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

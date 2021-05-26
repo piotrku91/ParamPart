@@ -5,7 +5,7 @@
 Arduino Serial String Data Splitter - ParamPart
 Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
-v. 3.6
+v. 3.7
 
 Github: https://github.com/piotrku91/ParamPart/
 */
@@ -27,7 +27,7 @@ enum class PT
 class ParamPart // Arduino String Serial Data Splitter
 {
 protected:
-  //////////////////////////// Errors
+  // ------------------------------------------ Errors ------------------------------------------
   enum class Errors
   {
     SyntaxError,
@@ -35,14 +35,14 @@ protected:
     MissingExtraParameter,
     Mismatch
   };
-  String ErrorMsgNames[4] = {{"SE!"}, {"UC!"}, {"MEP!"}, {"MM!"}};
+  const String ErrorMsgNames[4] = {{"SE!"}, {"UC!"}, {"MEP!"}, {"MM!"}}; // Error returns
 
-  //////////////////////////// Types
+  // ------------------------------------------  Types ------------------------------------------
 
   const String DebugNames[3] = {{"[Num]"}, {"[Txt]"}, {"[Any]"}}; // Debug types text
   PT *RType;                                                      // Params Type Table (dynamic array)
 
-  //////////////////////////// Members
+  // ------------------------------------------  Members ------------------------------------------
   const uint8_t m_Max;
   uint8_t m_ParamReadCount;
   bool m_SyntaxTest;
@@ -61,7 +61,7 @@ protected:
   String m_DebugIntegrityDump;
   String m_RawCopy;
 
-  // Public functions
+  // ------------------------------------------ Public functions ------------------------------------------
 public:
   void Clear();
   bool Header(const String &CmdName, bool Active = true);
@@ -87,7 +87,7 @@ public:
   String toJSON(); // Export Params to JSON format.
   String glue();
 
-  // Protectedfunctions
+  // ------------------------------------- Protected functions ------------------------------------------
 protected:
   bool syntaxVerify() { return m_SyntaxTest; };
   bool Slicer(String &LineS);
@@ -96,12 +96,12 @@ protected:
   void EmptyCut();
   String getFullCommand() { return m_OpenLine + m_Command + m_DelimiterChar; };
   String getCloseLine() const { return static_cast<String>(m_DelimiterChar) + static_cast<String>(m_CloseLine); };
-  const String& getError(Errors Err) {return ErrorMsgNames[static_cast<int>(Err)];};
+  const String &getError(Errors Err) { return ErrorMsgNames[static_cast<int>(Err)]; };
 
 public:
+  // ------------------------------------------ Public functions (overload and more) -------------------------
   // Overload operators
   void operator<<(const char Line[]);
-  void operator<<(char Line[]);
   void operator<<(String &Line);
   String operator[](uint8_t n) const;
 
@@ -109,7 +109,7 @@ public:
   String *begin() const { return &Params[0]; }
   String *end() const { return &Params[m_ParamReadCount]; }
 
-  // Constructors
+  // ------------------------------------- Constructors  -------------------------------------
 
   // Constructor for default syntax
   ParamPart(ParamPart &) = delete;
@@ -188,7 +188,7 @@ public:
     {
       if (m_DebugEnabled)
       {
-        m_DebugIntegrityDump = "MEP";
+        m_DebugIntegrityDump = getError(Errors::MissingExtraParameter);
       };            // Missing/Extra expected parameters
       return false; // Fail integrity test.
     };
@@ -267,14 +267,14 @@ public:
       if ((m_DebugEnabled) && (m_DebugIntegrityDump != ""))
         tmpReturn = m_DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
       if ((m_DebugEnabled) && (!getReadFlag() && (m_DebugIntegrityDump == "")))
-        tmpReturn = "UC! (" + m_Command + ")"; // Unknown command print
-      Clear();                                 // Clear parampart to prepare for the next input.
+        tmpReturn = getError(Errors::UnknownCommand) + " (" + m_Command + ")"; // Unknown command print
+      Clear();                                                                 // Clear parampart to prepare for the next input.
     }
     else
     { // (SYNTAX ERROR)
 
       if ((m_DebugEnabled))
-        tmpReturn = "SE!"; // Syntax Error - missing < or ; or >
+        tmpReturn = getError(Errors::SyntaxError); // Syntax Error - missing < or ; or >
     };
     return tmpReturn;
   };

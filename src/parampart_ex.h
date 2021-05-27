@@ -21,7 +21,7 @@ class ParamPart_Ex final : public ParamPart // Extended Arduino Serial Data Spli
 {
 
 public:
-   const SerialType * const ptr_Serial; // Pointer to Serial Object (HardwareSerial/SoftwareSerial)
+    SerialType * const ptr_Serial; // Pointer to Serial Object (HardwareSerial/SoftwareSerial)
 
     // Overloaded functions from basic version
     void HybridInterpreter(void (*ptn_func_interpreter)(ParamPart_Ex<SerialType> &PP));

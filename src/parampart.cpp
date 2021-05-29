@@ -219,8 +219,9 @@ String ParamPart::toJSON()
 String ParamPart::readDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
 {
   setReadFlag(true);
-  if (RtnMsg)
-    return (m_OpenLine + Rtn + m_DelimiterChar + m_Command + m_DelimiterChar + ParamRtn + m_DelimiterChar + m_CloseLine);
+  if (RtnMsg) {
+    return (m_OpenLine + Rtn + m_DelimiterChar + m_Command + m_DelimiterChar + ParamRtn + m_DelimiterChar + m_CloseLine);};
+    return "";
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

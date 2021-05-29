@@ -1,7 +1,7 @@
 #include "parampart.h"
 
 /* 
-Arduino Serial String Data Splitter - ParamPart
+Arduino Serial std::string Data Splitter - ParamPart
 Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
 v. 3.7
@@ -36,7 +36,7 @@ inline void ParamPart::Clear() // Clear everyting (Prepare to next input)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ParamPart::Header(const String &CmdName, bool Active) // Compare expected command with received command
+bool ParamPart::Header(const std::string &CmdName, bool Active) // Compare expected command with received command
 {
   if (Active)
   {
@@ -48,7 +48,7 @@ bool ParamPart::Header(const String &CmdName, bool Active) // Compare expected c
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Old version of Slicer (CString) - It is deavtivated and will be delete in the future.
+// Old version of Slicer (Cstd::string) - It is deavtivated and will be delete in the future.
 #if 0 
 bool ParamPart::CSlicer(char Line[]) 
 {
@@ -87,13 +87,13 @@ bool ParamPart::CSlicer(char Line[])
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ParamPart::Slicer(String &LineS) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
+bool ParamPart::Slicer(std::string &LineS) // Main function to split line to command and parameters (example format: <name;Peter;30;190;>)
 {
   // Clear();
   int i = 0; // Split counter
   char DC = m_DelimiterChar;
 
-  if ((LineS.indexOf(m_OpenLine) == -1) || (LineS.indexOf(DC) == -1) || (LineS.indexOf(m_CloseLine) == -1)) // Check if is syntax (example chars: <   ;   > )
+  if ((LineS.find(m_OpenLine) == std::string::npos) || (LineS.find(DC) == std::string::npos) || (LineS.find(m_CloseLine) == std::string::npos)) // Check if is syntax (example chars: <   ;   > )
   // FAIL //
   {
     m_SyntaxTest = false;
@@ -103,16 +103,16 @@ bool ParamPart::Slicer(String &LineS) // Main function to split line to command 
   else
   // PASS //
   {
-    int NextDel = LineS.indexOf(DC);       // Find first delimiter
-    m_Command = LineS.substring(1, NextDel); // Copy command to variable
-    LineS.remove(0, NextDel + 1);          // Delete from the begin to first delimiter + 1
-    NextDel = LineS.indexOf(DC);           // Find next delimiter
+    int NextDel = LineS.find(DC);             // Find first delimiter
+    m_Command = LineS.substr(1, NextDel - 1); // Copy command to variable
+    LineS.erase(0, NextDel + 1);              // Delete from the begin to first delimiter + 1
+    NextDel = LineS.find(DC);                 // Find next delimiter
 
     while ((NextDel != -1) && (i < m_Max)) // Find and assign all parameters
     {
-      Params[i] = LineS.substring(0, NextDel);
-      LineS.remove(0, NextDel + 1);
-      NextDel = LineS.indexOf(DC);
+      Params[i] = LineS.substr(0, NextDel);
+      LineS.erase(0, NextDel + 1);
+      NextDel = LineS.find(DC);
       i++; // increment split counter
     };
 
@@ -135,25 +135,30 @@ void ParamPart::CheckParamTypes()
   for (int i = 0; i < m_ParamReadCount; i++)
   {
 
-    if (Params[i] == "0") // If String is 0 then Param eqals to integer with value 0 (don't need any casting)
+    if (Params[i] == "0") // If std::string is 0 then Param eqals to integer with value 0 (don't need any casting)
     {
       RType[i] = PT::Num; // Set type as integer
     }
     else
     {
 
-      int TmpType = Params[i].toInt(); // Cast to integer
-      if (TmpType == 0)                // If is 0 then casting failed so type is string
-        RType[i] = PT::Txt;            // Set type as String
+      int TmpType; // Cast to integer
+      if (!(sscanf(Params[i].c_str(), "%d", &TmpType)))
+      {
+        TmpType = 0;
+      };
+
+      if (TmpType == 0)     // If is 0 then casting failed so type is string
+        RType[i] = PT::Txt; // Set type as std::string
       else
         RType[i] = PT::Num; // Set type
     };
   };
 };
 
-String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
+std::string ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
 {
-  String tmpReturn = "";
+  std::string tmpReturn = "";
   if (syntaxVerify())
   {                                 //   (SYNTAX OK)
     (*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.
@@ -162,8 +167,8 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
     if ((m_DebugEnabled) && (m_DebugIntegrityDump != ""))
       tmpReturn = m_DebugIntegrityDump; // Debug Integrity error print (if is ok, nothing to print)
     if ((m_DebugEnabled) && (!getReadFlag() && (m_DebugIntegrityDump == "")))
-      tmpReturn = getError(Errors::UnknownCommand)+" (" + m_Command + ")"; // Unknown command print
-    Clear();                               // Clear parampart to prepare for the next input.
+      tmpReturn = getError(Errors::UnknownCommand) + " (" + m_Command + ")"; // Unknown command print
+    Clear();                                                                 // Clear parampart to prepare for the next input.
   }
   else
   { // (SYNTAX ERROR)
@@ -176,11 +181,11 @@ String ParamPart::Interpreter(void (*ptn_func_interpreter)(ParamPart &PP)) // Th
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
+std::string ParamPart::glue() // You can modify some parameter and stick full command from scratch (dump actual object status)
 {
   //   Clear();
-  String glue_hand;
-  String tmpstr;
+  std::string glue_hand;
+  std::string tmpstr;
 
   glue_hand = m_OpenLine + m_Command; // Dump command
   glue_hand += m_DelimiterChar;
@@ -196,17 +201,17 @@ String ParamPart::glue() // You can modify some parameter and stick full command
   };
 
   glue_hand += m_CloseLine; // Close line
-  return glue_hand;       // Returns remastered line
+  return glue_hand;         // Returns remastered line
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::toJSON()
+std::string ParamPart::toJSON()
 {
-  String tmpJSON = "{\"name\": \"pp_exp\",\"cnt\": \"" + static_cast<String>(m_ParamReadCount) + "\",\"params\":[";
+  std::string tmpJSON = "{\"name\": \"pp_exp\",\"cnt\": \"" + std::to_string(m_ParamReadCount) + "\",\"params\":[";
   for (int i = 0; ((i < m_ParamReadCount) && (i < m_Max)); i++)
   {
-    tmpJSON += "{\""+DebugNames[static_cast<int>(RType[i])]+"\":\"" + Params[i] + "\"}";
+    tmpJSON += "{\"" + DebugNames[static_cast<int>(RType[i])] + "\":\"" + Params[i] + "\"}";
     if (i != (m_ParamReadCount - 1))
       tmpJSON += ',';
   };
@@ -216,11 +221,12 @@ String ParamPart::toJSON()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::readDone(bool RtnMsg, String ParamRtn, String Rtn) // If command code done
+std::string ParamPart::readDone(bool RtnMsg, std::string ParamRtn, std::string Rtn) // If command code done
 {
   setReadFlag(true);
   if (RtnMsg)
     return (m_OpenLine + Rtn + m_DelimiterChar + m_Command + m_DelimiterChar + ParamRtn + m_DelimiterChar + m_CloseLine);
+  return "";
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,8 +237,7 @@ void ParamPart::operator<<(const char Line[]) // Overload << const char[]
   Slicer(m_tmpnewLine);
 }
 
-
-void ParamPart::operator<<(String &Line) // Overload << String
+void ParamPart::operator<<(std::string &Line) // Overload << std::string
 {
   m_tmpnewLine = Line;
   Slicer(m_tmpnewLine);
@@ -240,7 +245,7 @@ void ParamPart::operator<<(String &Line) // Overload << String
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-String ParamPart::operator[](uint8_t n) const// Overload [] - returns reference to choosed param
+std::string ParamPart::operator[](uint8_t n) const // Overload [] - returns reference to choosed param
 {
   return Params[n];
 }
@@ -254,7 +259,7 @@ void ParamPart::setSyntaxChars(char OpenLine, char Delimiter, char CloseLine)
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ParamPart::setExportFunction(void (*External_Export_func)(const String &))
+void ParamPart::setExportFunction(void (*External_Export_func)(const std::string &))
 {
   Export_func = External_Export_func;
   m_CheckIntegrity = false;
@@ -267,7 +272,7 @@ void ParamPart::unsetExportFunction()
   m_CheckIntegrity = true;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool ParamPart::modifyParam(int ParamIndex, const String &Value)
+bool ParamPart::modifyParam(int ParamIndex, const std::string &Value)
 {
   if ((ParamIndex < m_ParamReadCount) && (ParamIndex < m_Max))
   {

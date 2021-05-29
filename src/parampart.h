@@ -1,8 +1,9 @@
 #pragma once
-#include <Arduino.h>
+#include <string>
+//#include <Arduino.h>
 
 /* 
-Arduino Serial String Data Splitter - ParamPart
+Arduino Serial std::string Data Splitter - ParamPart
 Written by Piotr K. (dajmosster@gmail.com / piotrq.eu) 
 2019 - 2021
 v. 3.7
@@ -24,7 +25,7 @@ enum class PT
   Any
 }; // Types to use with integrity checks. Use like PT::Num, PT::Txt, PT::Any as arguments in Integrity function.
 
-class ParamPart // Arduino String Serial Data Splitter
+class ParamPart // Arduino std::string Serial Data Splitter
 {
 protected:
   // ------------------------------------------ Errors ------------------------------------------
@@ -35,11 +36,11 @@ protected:
     MissingExtraParameter,
     Mismatch
   };
-  const String ErrorMsgNames[4] = {{"SE!"}, {"UC!"}, {"MEP!"}, {"MM!"}}; // Error returns
+  const std::string ErrorMsgNames[4] = {{"SE!"}, {"UC!"}, {"MEP!"}, {"MM!"}}; // Error returns
 
   // ------------------------------------------  Types ------------------------------------------
 
-  const String DebugNames[3] = {{"[Num]"}, {"[Txt]"}, {"[Any]"}}; // Debug types text
+  const std::string DebugNames[3] = {{"[Num]"}, {"[Txt]"}, {"[Any]"}}; // Debug types text
   PT *RType;                                                      // Params Type Table (dynamic array)
 
   // ------------------------------------------  Members ------------------------------------------
@@ -48,66 +49,66 @@ protected:
   bool m_SyntaxTest;
   bool m_ReadFlag;
 
-  String *Params; // Params String Table (dynamic array)
+  std::string *Params; // Params std::string Table (dynamic array)
 
-  String m_tmpnewLine; // Workflow variable
+  std::string m_tmpnewLine; // Workflow variable
   bool m_CheckIntegrity;
   bool m_DebugEnabled;
   char m_DelimiterChar;
   char m_OpenLine;
   char m_CloseLine;
-  String m_Command;
-  void (*Export_func)(const String &);
-  String m_DebugIntegrityDump;
-  String m_RawCopy;
+  std::string m_Command;
+  void (*Export_func)(const std::string &);
+  std::string m_DebugIntegrityDump;
+  std::string m_RawCopy;
 
   // ------------------------------------------ Public functions ------------------------------------------
 public:
   void Clear();
-  bool Header(const String &CmdName, bool Active = true);
-  String Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
-  String readDone(bool RtnMsg = true, String ParamRtn = "OK", String Rtn = "artn");
+  bool Header(const std::string &CmdName, bool Active = true);
+  std::string Interpreter(void (*ptn_func_interpreter)(ParamPart &PP));
+  std::string readDone(bool RtnMsg = true, std::string ParamRtn = "OK", std::string Rtn = "artn");
 
   // **Set functions
   void setDebugMode(bool DebugStatus) { m_DebugEnabled = DebugStatus; };
   void setIntegrityCheck(bool IntegrityStatus) { m_CheckIntegrity = IntegrityStatus; };
   void setSyntaxChars(char m_OpenLine, char Delimiter, char m_CloseLine);
-  bool modifyParam(int ParamIndex, const String &Value); // Raw edit option for Params.
+  bool modifyParam(int ParamIndex, const std::string &Value); // Raw edit option for Params.
   void setReadFlag(bool NewFlag) { m_ReadFlag = NewFlag; };
-  void setExportFunction(void (*External_Export_func)(const String &));
+  void setExportFunction(void (*External_Export_func)(const std::string &));
   void unsetExportFunction();
 
   // **Get functions
   uint8_t size() { return m_ParamReadCount; };
   bool getReadFlag() { return m_ReadFlag; };
-  String getParam(uint8_t n) const { return Params[n]; };
-  String getCommand() { return m_Command; };
-  String getRawCopy() { return m_RawCopy; };
-  String getDebugIntegrityDump() const { return m_DebugIntegrityDump; };
-  String toJSON(); // Export Params to JSON format.
-  String glue();
+  std::string getParam(uint8_t n) const { return Params[n]; };
+  std::string getCommand() { return m_Command; };
+  std::string getRawCopy() { return m_RawCopy; };
+  std::string getDebugIntegrityDump() const { return m_DebugIntegrityDump; };
+  std::string toJSON(); // Export Params to JSON format.
+  std::string glue();
 
   // ------------------------------------- Protected functions ------------------------------------------
 protected:
   bool syntaxVerify() { return m_SyntaxTest; };
-  bool Slicer(String &LineS);
+  bool Slicer(std::string &LineS);
   bool CSlicer(char Line[]);
   void CheckParamTypes();
   void EmptyCut();
-  String getFullCommand() { return m_OpenLine + m_Command + m_DelimiterChar; };
-  String getCloseLine() const { return static_cast<String>(m_DelimiterChar) + static_cast<String>(m_CloseLine); };
-  const String &getError(Errors Err) { return ErrorMsgNames[static_cast<int>(Err)]; };
+  std::string getFullCommand() { return m_OpenLine + m_Command + m_DelimiterChar; };
+  std::string getCloseLine() const { return std::string(m_DelimiterChar,m_CloseLine); };
+  const std::string &getError(Errors Err) { return ErrorMsgNames[static_cast<int>(Err)]; };
 
 public:
   // ------------------------------------------ Public functions (overload and more) -------------------------
   // Overload operators
   void operator<<(const char Line[]);
-  void operator<<(String &Line);
-  String operator[](uint8_t n) const;
+  void operator<<(std::string &Line);
+  std::string operator[](uint8_t n) const;
 
   // First and last element for range-based loops
-  String *begin() const { return &Params[0]; }
-  String *end() const { return &Params[m_ParamReadCount]; }
+  std::string *begin() const { return &Params[0]; }
+  std::string *end() const { return &Params[m_ParamReadCount]; }
 
   // ------------------------------------- Constructors  -------------------------------------
 
@@ -118,7 +119,7 @@ public:
 
   // Constructor with overloaded syntax.
   ParamPart(const int &size, char OL, char DL, char CL) // Main constructor
-      : m_Max(size), Params(new String[m_Max]), RType(new PT[m_Max]), m_OpenLine(OL), m_DelimiterChar(DL), m_CloseLine(CL), m_DebugIntegrityDump(""), m_tmpnewLine(""), m_CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+      : m_Max(size), Params(new std::string[m_Max]), RType(new PT[m_Max]), m_OpenLine(OL), m_DelimiterChar(DL), m_CloseLine(CL), m_DebugIntegrityDump(""), m_tmpnewLine(""), m_CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
         m_DebugEnabled(DEBUG_DEFAULT_STATUS), m_ParamReadCount(0), m_SyntaxTest(false), m_ReadFlag(false), Export_func(nullptr)
   {
     Clear();
@@ -237,7 +238,7 @@ public:
   //                                  Template for overload () operator Function
 
   template <typename... TPack>
-  bool operator()(const String &CMD, const bool &Active, TPack &&...args)
+  bool operator()(const std::string &CMD, const bool &Active, TPack &&...args)
   {
     return ((Header(CMD, Active)) && Integrity(args...));
   };
@@ -256,9 +257,9 @@ public:
 
 */
   template <typename T>
-  String Interpreter(T *M, void (T::*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only string with score.
+  std::string Interpreter(T *M, void (T::*ptn_func_interpreter)(ParamPart &PP)) // This version of function returns only std::string with score.
   {
-    String tmpReturn = "";
+    std::string tmpReturn = "";
     if (syntaxVerify())
     {                                    //   (SYNTAX OK)
       (M->*ptn_func_interpreter)(*this); // Execute reaction function (callback), push pointer of this class to access from external function.

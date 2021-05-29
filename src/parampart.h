@@ -78,7 +78,7 @@ public:
   void unsetExportFunction();
 
   // **Get functions
-  int size() { return m_ParamReadCount; };
+  uint8_t size() { return m_ParamReadCount; };
   bool getReadFlag() { return m_ReadFlag; };
   String getParam(uint8_t n) const { return Params[n]; };
   String getCommand() { return m_Command; };

@@ -87,7 +87,7 @@ ParamPart_Ex - Extended version with Serial control. (parampart_ex.h)
 
 ParamPart - Normal basic version with no Serial control. (parampart.h)
 
-ParamPart (PCS) - Normal basic version to use on PC side (port). It is compatibility to use with Qt (It is in another repository).
+ParamPart (PCS) - Normal basic version to use on PC side (port). It is compatibility to use with Qt (It is in another branch).
 
 
 ## ParamPart_Ex

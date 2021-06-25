@@ -35,7 +35,6 @@ public:
 
     
     ParamPart_Ex(SerialType *WS, char OL = '<', char DL = ';', char CL = '>') : ParamPart(9, OL, DL, CL), ptr_Serial(WS){};
-    ParamPart_Ex(SerialType *WS, int size) : ParamPart(size), ptr_Serial(WS){};
     ParamPart_Ex(SerialType *WS, int size, char OL = '<', char DL = ';', char CL = '>') : ParamPart(size, OL, DL, CL), ptr_Serial(WS){};
     ~ParamPart_Ex() {};
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

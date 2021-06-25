@@ -118,7 +118,7 @@ public:
 
   // Constructor with overloaded syntax.
   ParamPart(const int &size, char OL, char DL, char CL) // Main constructor
-      : m_Max(size), Params(new String[m_Max]), RType(new PT[m_Max]), m_OpenLine(OL), m_DelimiterChar(DL), m_CloseLine(CL), m_DebugIntegrityDump(""), m_tmpnewLine(""), m_CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
+      : m_Max(size), Params(new String[size]), RType(new PT[size]), m_OpenLine(OL), m_DelimiterChar(DL), m_CloseLine(CL), m_DebugIntegrityDump(""), m_tmpnewLine(""), m_CheckIntegrity(CHECK_INTEGRITY_DEFAULT_STATUS),
         m_DebugEnabled(DEBUG_DEFAULT_STATUS), m_ParamReadCount(0), m_SyntaxTest(false), m_ReadFlag(false), Export_func(nullptr)
   {
     Clear();

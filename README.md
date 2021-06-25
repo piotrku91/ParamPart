@@ -77,6 +77,11 @@ And you can do something by Reaction function:
     ////////////////////////////////////////////////////////////////////////////////////////////////
        };
 
+Some examples and more information you can find on my YouTube channel:
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/d5QSMJFkmyw/0.jpg)](https://www.youtube.com/watch?v=d5QSMJFkmyw "LQArm development: ParamPart Arduino Serial Data Splitter (odc. 1)")
+
+https://www.youtube.com/watch?v=d5QSMJFkmyw
+
 
 
 
@@ -87,7 +92,7 @@ ParamPart_Ex - Extended version with Serial control. (parampart_ex.h)
 
 ParamPart - Normal basic version with no Serial control. (parampart.h)
 
-ParamPart (PCS) - Normal basic version to use on PC side (port). It is compatibility to use with Qt (It is in another repository).
+ParamPart (PCS) - Normal basic version to use on PC side (port). It is compatibility to use with Qt (It is in another branch).
 
 
 ## ParamPart_Ex
